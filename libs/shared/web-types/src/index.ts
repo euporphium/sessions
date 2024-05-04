@@ -1,1 +1,1 @@
-export * from './lib/web-types';
+export * from './lib/types';

@@ -1,6 +1,6 @@
 import http from 'http';
 import express from 'express';
-import { Server } from 'socket.io';
+import { registerSocketServer } from './socketServer';
 
 const app = express();
 
@@ -9,21 +9,10 @@ app.get('/', (req, res) => {
 });
 
 const server = http.createServer(app);
+
+registerSocketServer(server);
+
 const port = process.env.PORT || 3333;
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-  },
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
-
 server.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });
