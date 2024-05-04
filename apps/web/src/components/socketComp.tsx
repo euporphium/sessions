@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { socket } from './socket';
 
 export default function SocketComp() {
-  const [isConnected, setIsConnected] = useState(socket?.connected ?? false);
+  const [isConnected, setIsConnected] = useState(socket.connected);
   const [fooEvents, setFooEvents] = useState<string[]>([]);
 
   useEffect(() => {
