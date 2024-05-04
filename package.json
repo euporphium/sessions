@@ -4,13 +4,18 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "@nx/js": "18.3.4",
+    "@nx/next": "18.3.4",
     "@nx/workspace": "18.3.4",
     "nx": "18.3.4"
   },
   "engines": {
     "node": ">=20 <22"
+  },
+  "dependencies": {
+    "next": "~14.2.3",
+    "react": "~18.3.1",
+    "react-dom": "~18.3.1"
   }
 }
