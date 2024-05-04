@@ -19,8 +19,8 @@
     "**/*.js",
     "**/*.jsx",
 
-    "../../app/web/.next/types/**/*.ts",
-    "../../dist/app/web/.next/types/**/*.ts",
+    "../../apps/web/.next/types/**/*.ts",
+    "../../dist/apps/web/.next/types/**/*.ts",
 
     "next-env.d.ts",
     ".next/types/**/*.ts"
