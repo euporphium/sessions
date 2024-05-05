@@ -79,6 +79,8 @@ export function useSocket() {
   const { socket } = context;
 
   return {
+    // TODO: undecided if we should expose the socket object
+    socket: socket,
     connect: () => socket.connect(),
     disconnect: () => socket.disconnect(),
     meta: context.meta,

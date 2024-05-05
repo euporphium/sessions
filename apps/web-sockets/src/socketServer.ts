@@ -20,11 +20,15 @@ export function registerSocketServer(server: http.Server) {
   });
 
   io.on('connection', (socket) => {
-    socket.emit('foo', '42');
     console.log('a user connected');
 
+    socket.on('chat', (message) => {
+      console.log('chatting', message);
+      socket.broadcast.emit('chat', message);
+    });
+
     socket.on('disconnect', () => {
-      console.log('user disconnected');
+      console.log('a user disconnected');
     });
   });
 
