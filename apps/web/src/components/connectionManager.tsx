@@ -1,24 +1,21 @@
 'use client';
 
-import { socket } from './socket';
+import { useSocket } from './socketContext';
 
 export default function ConnectionManager() {
-  function connect() {
-    socket.connect();
-  }
-
-  function disconnect() {
-    socket.disconnect();
-  }
+  const { connect, disconnect, meta } = useSocket();
+  const { isConnected, transport } = meta;
 
   return (
-    <div className="flex gap-2">
-      <button className="bg-blue-200 p-2" onClick={connect}>
-        Connect
+    <div className="flex gap-4 p-4">
+      <button
+        className="bg-blue-200 p-2"
+        onClick={isConnected ? disconnect : connect}
+      >
+        {isConnected ? 'Disconnect' : 'Connect'}
       </button>
-      <button className="bg-blue-200 p-2" onClick={disconnect}>
-        Disconnect
-      </button>
+      <div>Connected: {isConnected ? 'Yes' : 'No'}</div>
+      <div>Transport: {transport}</div>
     </div>
   );
 }
