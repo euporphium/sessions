@@ -4,7 +4,10 @@ import { useSocket } from './socketContext';
 import { useEffect, useState } from 'react';
 
 export default function Chat() {
-  const { socket } = useSocket();
+  const {
+    socket,
+    meta: { isConnected },
+  } = useSocket();
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     [],
   );
@@ -21,6 +24,12 @@ export default function Chat() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isConnected) {
+      setMessages([]);
+    }
+  }, [isConnected]);
+
   function submitHandler(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -36,24 +45,34 @@ export default function Chat() {
   }
 
   return (
-    <div>
-      {messages.map((message, index) => (
-        <div
-          key={index}
-          className={message.sender === 'You' ? 'bg-blue-400' : 'bg-green-400'}
-        >
-          <strong>{message.sender}</strong>: {message.text}
-        </div>
-      ))}
-      <form className="" onSubmit={submitHandler}>
-        <label htmlFor="name">Name</label>
-        <input type="text" name="name" />
+    <div className="grid max-w-lg gap-4 bg-gray-300 p-4">
+      <ul className="flex flex-col gap-2">
+        {messages.map((message, i) => (
+          <li
+            key={i}
+            className={
+              message.sender === 'You'
+                ? 'self-end bg-blue-400 p-2'
+                : 'self-start bg-green-400 p-2'
+            }
+          >
+            <strong>{message.sender}</strong>: {message.text}
+          </li>
+        ))}
+      </ul>
+      {isConnected && (
+        <form className="" onSubmit={submitHandler}>
+          <label htmlFor="name">Name</label>
+          <input type="text" name="name" />
 
-        <label htmlFor="message">Message</label>
-        <input type="text" name="message" />
+          <label htmlFor="message">Message</label>
+          <input type="text" name="message" />
 
-        <button type="submit">Send</button>
-      </form>
+          <button type="submit" className="bg-blue-200 p-2">
+            Send
+          </button>
+        </form>
+      )}
     </div>
   );
 }
