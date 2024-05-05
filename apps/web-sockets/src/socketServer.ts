@@ -21,6 +21,10 @@ export function registerSocketServer(server: http.Server) {
 
   io.on('connection', (socket) => {
     console.log('a user connected');
+    io.emit('chat', {
+      sender: 'Server',
+      text: 'A user connected',
+    });
 
     socket.on('chat', (message) => {
       console.log('chatting', message);
@@ -29,6 +33,11 @@ export function registerSocketServer(server: http.Server) {
 
     socket.on('disconnect', () => {
       console.log('a user disconnected');
+
+      io.emit('chat', {
+        sender: 'Server',
+        text: 'A user connected',
+      });
     });
   });
 
