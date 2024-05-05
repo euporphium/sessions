@@ -70,12 +70,6 @@ devDependencies:
   '@playwright/test':
     specifier: ^1.36.0
     version: 1.43.1
-  '@pmmmwh/react-refresh-webpack-plugin':
-    specifier: ^0.5.7
-    version: 0.5.13(react-refresh@0.10.0)(webpack@5.91.0)
-  '@svgr/webpack':
-    specifier: ^8.0.1
-    version: 8.1.0(typescript@5.4.5)
   '@swc-node/register':
     specifier: ~1.9.1
     version: 1.9.1(@swc/core@1.4.17)(@swc/types@0.1.6)(typescript@5.4.5)
@@ -151,9 +145,6 @@ devDependencies:
   prettier:
     specifier: 3.2.5
     version: 3.2.5
-  react-refresh:
-    specifier: ^0.10.0
-    version: 0.10.0
   tailwindcss:
     specifier: ^3.4.3
     version: 3.4.3
@@ -3005,43 +2996,6 @@ packages:
     dependencies:
       playwright: 1.43.1
 
-  /@pmmmwh/react-refresh-webpack-plugin@0.5.13(react-refresh@0.10.0)(webpack@5.91.0):
-    resolution: {integrity: sha512-odZVYXly+JwzYri9rKqqUAk0cY6zLpv4dxoKinhoJNShV36Gpxf+CyDIILJ4tYsJ1ZxIWs233Y39iVnynvDA/g==}
-    engines: {node: '>= 10.13'}
-    peerDependencies:
-      '@types/webpack': 4.x || 5.x
-      react-refresh: '>=0.10.0 <1.0.0'
-      sockjs-client: ^1.4.0
-      type-fest: '>=0.17.0 <5.0.0'
-      webpack: '>=4.43.0 <6.0.0'
-      webpack-dev-server: 3.x || 4.x || 5.x
-      webpack-hot-middleware: 2.x
-      webpack-plugin-serve: 0.x || 1.x
-    peerDependenciesMeta:
-      '@types/webpack':
-        optional: true
-      sockjs-client:
-        optional: true
-      type-fest:
-        optional: true
-      webpack-dev-server:
-        optional: true
-      webpack-hot-middleware:
-        optional: true
-      webpack-plugin-serve:
-        optional: true
-    dependencies:
-      ansi-html-community: 0.0.8
-      core-js-pure: 3.37.0
-      error-stack-parser: 2.1.4
-      html-entities: 2.5.2
-      loader-utils: 2.0.4
-      react-refresh: 0.10.0
-      schema-utils: 3.3.0
-      source-map: 0.7.4
-      webpack: 5.91.0(@swc/core@1.4.17)(webpack-cli@5.1.4)
-    dev: true
-
   /@polka/url@1.0.0-next.25:
     resolution: {integrity: sha512-j7P6Rgr3mmtdkeDGTe0E/aYyWEWVtc5yFXtHCRHs28/jptDEWfaVOc5T7cblqy1XKPPfCxJc/8DwQ5YgLOZOVQ==}
     dev: true
@@ -5230,11 +5184,6 @@ packages:
       browserslist: 4.23.0
     dev: true
 
-  /core-js-pure@3.37.0:
-    resolution: {integrity: sha512-d3BrpyFr5eD4KcbRvQ3FTUx/KWmaDesr7+a3+1+P46IUnNoEt+oiLijPINZMEon7w9oGkIINWxrBAU9DEciwFQ==}
-    requiresBuild: true
-    dev: true
-
   /core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
     dev: true
@@ -5877,12 +5826,6 @@ packages:
     resolution: {integrity: sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==}
     dependencies:
       is-arrayish: 0.2.1
-    dev: true
-
-  /error-stack-parser@2.1.4:
-    resolution: {integrity: sha512-Sk5V6wVazPhq5MhpO+AUxJn5x7XSXGl1R93Vn7i+zS15KDVxQijejNCrz8340/2bgLBjR9GtEG8ZVKONDjcqGQ==}
-    dependencies:
-      stackframe: 1.3.4
     dev: true
 
   /es-abstract@1.23.3:
@@ -9704,11 +9647,6 @@ packages:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
     dev: true
 
-  /react-refresh@0.10.0:
-    resolution: {integrity: sha512-PgidR3wST3dDYKr6b4pJoqQFpPGNKDSCDx4cZoshjXipw3LzO7mG1My2pwEzz2JVkF+inx3xRpDeQLFQGH/hsQ==}
-    engines: {node: '>=0.10.0'}
-    dev: true
-
   /react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
     engines: {node: '>=0.10.0'}
@@ -10391,10 +10329,6 @@ packages:
 
   /stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
-    dev: true
-
-  /stackframe@1.3.4:
-    resolution: {integrity: sha512-oeVtt7eWQS+Na6F//S4kJ2K2VbRlS9D43mAlMyVpVWovy9o+jfgH8O9agzANzaiLjclA0oYzUXEM4PurhSUChw==}
     dev: true
 
   /statuses@1.5.0:
