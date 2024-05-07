@@ -1,6 +1,6 @@
 import http from 'http';
 import express from 'express';
-import { registerSocketServer } from './socketServer';
+import { addSocketServer } from './socketServer';
 
 const app = express();
 
@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
 
 const server = http.createServer(app);
 
-registerSocketServer(server);
+addSocketServer(server);
 
 const port = process.env.PORT || 3333;
 server.listen(port, () => {

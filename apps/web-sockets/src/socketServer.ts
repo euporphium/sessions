@@ -7,7 +7,7 @@ import {
   SocketData,
 } from '@sessions/web-types';
 
-export function registerSocketServer(server: http.Server) {
+export function addSocketServer(server: http.Server) {
   const io = new Server<
     ClientToServerEvents,
     ServerToClientEvents,
