@@ -1,11 +1,17 @@
+import type { Server } from 'socket.io';
+
+export type SocketSession = {
+  id: string;
+};
+
+export type ChatMessage = {
+  sender: string;
+  text: string;
+};
+
 export type ClientToServerEvents = {
   hello: () => void;
   chat: (message: ChatMessage) => void;
-};
-
-type ChatMessage = {
-  sender: string;
-  text: string;
 };
 
 export type ServerToClientEvents = {
@@ -19,6 +25,13 @@ export type InterServerEvents = {
 };
 
 export type SocketData = {
-  name: string;
-  age: number;
+  id: string;
+  session: SocketSession;
 };
+
+export type SessionsSocketServer = Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>;
