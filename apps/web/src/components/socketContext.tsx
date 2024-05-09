@@ -51,12 +51,18 @@ export function SocketContextProvider({
       setTransport('N/A');
     }
 
+    function onConnectError(error: Error) {
+      console.error('connect_error:', error.message);
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+    socket.on('connect_error', onConnectError);
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      socket.off('connect_error', onConnectError);
     };
   }, []);
 
