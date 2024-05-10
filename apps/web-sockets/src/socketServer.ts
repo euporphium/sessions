@@ -1,23 +1,17 @@
 import http from 'http';
 import { Server } from 'socket.io';
-import {
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
-  SessionsSocketServer,
-} from '@sessions/web-types';
+import { SessionsSocketServer } from '@sessions/web-types';
 import { InMemorySessionStore } from './sessionStore';
+import { getLogger } from './logger';
+
+const logger = getLogger();
+const sessionStore = new InMemorySessionStore(logger);
 
 export function addSocketServer(server: http.Server) {
-  const serverOptions = { cors: { origin: 'http://localhost:3000' } };
+  logger.verbose('adding socket server');
 
-  const io = new Server<
-    ClientToServerEvents,
-    ServerToClientEvents,
-    InterServerEvents,
-    SocketData
-  >(server, serverOptions);
+  const serverOptions = { cors: { origin: 'http://localhost:3000' } };
+  const io: SessionsSocketServer = new Server(server, serverOptions);
 
   registerSessionMiddleware(io);
   registerEvents(io);
@@ -26,29 +20,41 @@ export function addSocketServer(server: http.Server) {
 }
 
 function registerSessionMiddleware(io: SessionsSocketServer) {
-  const sessionStore = new InMemorySessionStore();
-
-  sessionStore
-    .findAllSessions()
-    .forEach((session) => console.log('session', session.id));
+  logger.verbose('registering session middleware');
 
   io.use((socket, next) => {
     const sessionId = socket.handshake.auth.sessionId;
-    const session = sessionStore.findSession(sessionId);
 
-    if (session) {
-      socket.data.id = session ? session.id : sessionStore.createSession();
-    } else {
-      socket.data.id = sessionStore.createSession();
+    if (sessionId) {
+      logger.verbose('checking for session with provided id:', sessionId);
+
+      const session = sessionStore.findSession(sessionId);
+
+      if (session) {
+        logger.verbose('session found:', session);
+
+        socket.data.sessionId = session
+          ? session.id
+          : sessionStore.createSession();
+      }
     }
+
+    socket.data.sessionId = sessionStore.createSession();
 
     next();
   });
 }
 
 function registerEvents(io: SessionsSocketServer) {
+  logger.verbose('registering events');
+
   io.on('connection', (socket) => {
-    console.log('socket connected:', socket.data);
+    logger.verbose('socket connected');
+
+    sessionStore.saveSession(socket.data.sessionId, {
+      id: socket.data.sessionId,
+      connected: true,
+    });
 
     io.emit('chat', {
       sender: 'Server',
@@ -56,12 +62,21 @@ function registerEvents(io: SessionsSocketServer) {
     });
 
     socket.on('chat', (message) => {
-      console.log('chatting', message);
+      logger.info('chatting', message);
       socket.broadcast.emit('chat', message);
     });
 
-    socket.on('disconnect', (reason) => {
-      console.log('socket disconnected:', reason);
+    socket.on('disconnect', async (reason) => {
+      logger.info('socket disconnected');
+
+      const matchingSockets = await io.in(socket.id).fetchSockets();
+      const isDisconnected = matchingSockets.length === 0;
+      if (isDisconnected) {
+        sessionStore.saveSession(socket.data.sessionId, {
+          id: socket.data.sessionId,
+          connected: false,
+        });
+      }
 
       io.emit('chat', {
         sender: 'Server',

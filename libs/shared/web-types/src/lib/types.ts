@@ -2,6 +2,7 @@ import type { Server } from 'socket.io';
 
 export type SocketSession = {
   id: string;
+  connected: boolean;
 };
 
 export type ChatMessage = {
@@ -22,10 +23,11 @@ export type ServerToClientEvents = {
 
 export type InterServerEvents = {
   ping: () => void;
+  handshake: (data: string) => void;
 };
 
 export type SocketData = {
-  id: string;
+  sessionId: string;
   session: SocketSession;
 };
 
