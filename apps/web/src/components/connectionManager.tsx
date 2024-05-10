@@ -1,9 +1,9 @@
 'use client';
 
-import { useSocket } from './socketContext';
+import { useSocketClient } from './socketContext';
 
 export default function ConnectionManager() {
-  const { connect, disconnect, meta } = useSocket();
+  const { connect, disconnect, meta } = useSocketClient();
   const { isConnected, transport } = meta;
 
   return (

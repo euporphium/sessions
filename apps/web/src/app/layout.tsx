@@ -1,4 +1,3 @@
-import { SocketContextProvider } from '../components/socketContext';
 import './global.css';
 
 export const metadata = {
@@ -13,9 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <SocketContextProvider>{children}</SocketContextProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

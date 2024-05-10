@@ -1,4 +1,5 @@
 import type { Server } from 'socket.io';
+import type { Socket } from 'socket.io-client';
 
 export type SocketSession = {
   id: string;
@@ -16,14 +17,12 @@ export type ClientToServerEvents = {
 };
 
 export type ServerToClientEvents = {
-  noArg: () => void;
-  arg: (data: string) => void;
+  session: (session: Pick<SocketSession, 'id'>) => void; // typed quickly - think about it
   chat: (message: ChatMessage) => void;
 };
 
 export type InterServerEvents = {
   ping: () => void;
-  handshake: (data: string) => void;
 };
 
 export type SocketData = {
@@ -36,4 +35,9 @@ export type SessionsSocketServer = Server<
   ServerToClientEvents,
   InterServerEvents,
   SocketData
+>;
+
+export type SessionsSocketClient = Socket<
+  ServerToClientEvents,
+  ClientToServerEvents
 >;

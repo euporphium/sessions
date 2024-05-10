@@ -1,11 +1,8 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { io, type Socket } from 'socket.io-client';
-import {
-  ClientToServerEvents,
-  ServerToClientEvents,
-} from '@sessions/web-types';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { io } from 'socket.io-client';
+import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
 
 // "undefined" means the URL will be computed from the `window.location` object
 const URL =
@@ -16,7 +13,7 @@ type SocketContextProviderProps = {
 };
 
 type SocketContext = {
-  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  socket: SessionsSocketClient;
   meta: {
     isConnected: boolean;
     transport: string;
@@ -25,46 +22,14 @@ type SocketContext = {
 
 const SocketContext = createContext<SocketContext | null>(null);
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(URL!, {
-  // TODO: (IF changed to true) -> ERROR: Text content does not match server-rendered HTML.
-  // Fix: https://socket.io/how-to/use-with-nextjs#client
-  autoConnect: false,
-});
-
 export function SocketContextProvider({
   children,
 }: SocketContextProviderProps) {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [transport, setTransport] = useState<string>('N/A');
+  const { socket, isConnected, transport } = useSocket();
 
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-
-      socket.io.engine.on('upgrade', (transport) => {
-        setTransport(transport.name);
-      });
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-      setTransport('N/A');
-    }
-
-    function onConnectError(error: Error) {
-      console.error('connect_error:', error.message);
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('connect_error', onConnectError);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('connect_error', onConnectError);
-    };
-  }, []);
+  if (!socket) {
+    return <div className="min-h-screen bg-red-800">Loading</div>;
+  }
 
   return (
     <SocketContext.Provider
@@ -75,7 +40,7 @@ export function SocketContextProvider({
   );
 }
 
-export function useSocket() {
+export function useSocketClient() {
   const context = useContext(SocketContext);
 
   if (context === null) {
@@ -91,4 +56,66 @@ export function useSocket() {
     disconnect: () => socket.disconnect(),
     meta: context.meta,
   };
+}
+
+function useSocket() {
+  const [socket, setSocket] = useState<SessionsSocketClient | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState<string>('N/A');
+
+  useEffect(() => {
+    if (socket) {
+      onConnect();
+      return;
+    }
+
+    const newSocket = io(URL!, {
+      autoConnect: false,
+      auth: {
+        sessionId: localStorage.getItem('sessionId'),
+      },
+    });
+
+    setSocket(newSocket);
+
+    function onConnect() {
+      setIsConnected(true);
+
+      newSocket.io.engine.on('upgrade', (transport) => {
+        setTransport(transport.name);
+      });
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+      setTransport('N/A');
+    }
+
+    function onConnectError(error: Error) {
+      console.error('connect_error:', error.message);
+    }
+
+    newSocket.on('connect', onConnect);
+    newSocket.on('disconnect', onDisconnect);
+    newSocket.on('connect_error', onConnectError);
+
+    registerCustomListeners(newSocket);
+
+    return () => {
+      newSocket.off('connect', onConnect);
+      newSocket.off('disconnect', onDisconnect);
+      newSocket.off('connect_error', onConnectError);
+    };
+  }, []);
+
+  return { socket, isConnected, transport };
+}
+
+function registerCustomListeners(socket: SessionsSocketClient) {
+  // typed quickly - think about it
+  function onSession(session: Pick<SocketSession, 'id'>) {
+    localStorage.setItem('sessionId', session.id);
+  }
+
+  socket.on('session', onSession);
 }

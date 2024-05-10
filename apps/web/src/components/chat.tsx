@@ -1,18 +1,22 @@
 'use client';
 
-import { useSocket } from './socketContext';
+import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
 
 export default function Chat() {
   const {
     socket,
     meta: { isConnected },
-  } = useSocket();
+  } = useSocketClient();
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     [],
   );
 
   useEffect(() => {
+    if (!socket) {
+      return;
+    }
+
     function onChat(message: { sender: string; text: string }) {
       setMessages((prev) => [...prev, message]);
     }
@@ -22,7 +26,7 @@ export default function Chat() {
     return () => {
       socket.off('chat', onChat);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     if (!isConnected) {

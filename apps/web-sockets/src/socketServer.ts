@@ -26,20 +26,22 @@ function registerSessionMiddleware(io: SessionsSocketServer) {
     const sessionId = socket.handshake.auth.sessionId;
 
     if (sessionId) {
-      logger.verbose('checking for session with provided id:', sessionId);
-
+      logger.verbose(`checking for session: ${sessionId}`);
       const session = sessionStore.findSession(sessionId);
 
       if (session) {
-        logger.verbose('session found:', session);
-
-        socket.data.sessionId = session
-          ? session.id
-          : sessionStore.createSession();
+        logger.verbose(`session found: ${session.id}`);
+        socket.data.sessionId = session.id;
+      } else {
+        logger.verbose(`session not found: ${sessionId}`);
+        socket.data.sessionId = sessionStore.createSession();
       }
+    } else {
+      logger.verbose('no session id provided');
+      socket.data.sessionId = sessionStore.createSession();
     }
 
-    socket.data.sessionId = sessionStore.createSession();
+    socket.emit('session', { id: socket.data.sessionId });
 
     next();
   });
@@ -49,12 +51,9 @@ function registerEvents(io: SessionsSocketServer) {
   logger.verbose('registering events');
 
   io.on('connection', (socket) => {
-    logger.verbose('socket connected');
+    logger.verbose(`socket connected with session: ${socket.data.sessionId}`);
 
-    sessionStore.saveSession(socket.data.sessionId, {
-      id: socket.data.sessionId,
-      connected: true,
-    });
+    sessionStore.updateSession(socket.data.sessionId, { connected: true });
 
     io.emit('chat', {
       sender: 'Server',
@@ -62,25 +61,22 @@ function registerEvents(io: SessionsSocketServer) {
     });
 
     socket.on('chat', (message) => {
-      logger.info('chatting', message);
+      logger.info(`${message.sender} sent chat: ${message.text}`);
       socket.broadcast.emit('chat', message);
     });
 
     socket.on('disconnect', async (reason) => {
-      logger.info('socket disconnected');
+      logger.verbose(`socket disconnected: ${reason}`);
 
       const matchingSockets = await io.in(socket.id).fetchSockets();
       const isDisconnected = matchingSockets.length === 0;
       if (isDisconnected) {
-        sessionStore.saveSession(socket.data.sessionId, {
-          id: socket.data.sessionId,
-          connected: false,
-        });
+        sessionStore.updateSession(socket.data.sessionId, { connected: false });
       }
 
       io.emit('chat', {
         sender: 'Server',
-        text: 'A user connected',
+        text: 'A user disconnected',
       });
     });
   });

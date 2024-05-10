@@ -8,15 +8,13 @@ export class InMemorySessionStore {
   constructor(logger: Logger) {
     this.logger = logger;
     this.logger.verbose('initializing in-memory session store');
-
     this.sessions = new Map();
   }
 
   createSession() {
-    this.logger.verbose('creating session');
-
     const newId = crypto.randomUUID();
-    this.saveSession(newId, { id: newId, connected: true });
+    this.saveSession(newId, { id: newId, connected: false });
+    this.logger.verbose(`creating session with id: ${newId}`);
     return newId;
   }
 
@@ -28,6 +26,19 @@ export class InMemorySessionStore {
     this.sessions.set(sessionId, session);
 
     this.logger.debug(this.findAllSessions());
+  }
+
+  updateSession(
+    sessionId: string,
+    session: Partial<Omit<SocketSession, 'id'>>,
+  ) {
+    const currentSession = this.sessions.get(sessionId);
+
+    if (!currentSession) {
+      throw new Error(`Session with ID ${sessionId} does not exist.`);
+    }
+
+    this.sessions.set(sessionId, { ...currentSession, ...session });
   }
 
   findAllSessions() {
