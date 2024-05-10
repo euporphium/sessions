@@ -55,10 +55,9 @@ function registerEvents(io: SessionsSocketServer) {
 
     sessionStore.updateSession(socket.data.sessionId, { connected: true });
 
-    io.emit('chat', {
-      sender: 'Server',
-      text: 'A user connected',
-    });
+    socket.join(socket.data.sessionId);
+
+    io.emit('chat', { sender: 'Server', text: 'A user connected' });
 
     socket.on('chat', (message) => {
       logger.info(`${message.sender} sent chat: ${message.text}`);

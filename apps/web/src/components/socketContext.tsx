@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
 
@@ -52,9 +52,9 @@ export function useSocketClient() {
   return {
     // TODO: undecided if we should expose the socket object
     socket: socket,
+    meta: context.meta,
     connect: () => socket.connect(),
     disconnect: () => socket.disconnect(),
-    meta: context.meta,
   };
 }
 
@@ -114,6 +114,7 @@ function useSocket() {
 function registerCustomListeners(socket: SessionsSocketClient) {
   // typed quickly - think about it
   function onSession(session: Pick<SocketSession, 'id'>) {
+    console.log(`received session id: ${session.id} - storing in localStorage`);
     localStorage.setItem('sessionId', session.id);
   }
 
