@@ -23,7 +23,7 @@ function registerSessionMiddleware(io: SessionsSocketServer) {
   logger.verbose('registering session middleware');
 
   io.use((socket, next) => {
-    const sessionId = socket.handshake.auth.sessionId;
+    const { sessionId, peerSessionId } = socket.handshake.auth;
 
     if (sessionId) {
       logger.verbose(`checking for session: ${sessionId}`);
@@ -41,6 +41,8 @@ function registerSessionMiddleware(io: SessionsSocketServer) {
       socket.data.sessionId = sessionStore.createSession();
     }
 
+    socket.data.peerSessionId = peerSessionId;
+
     socket.emit('session', { id: socket.data.sessionId });
 
     next();
@@ -56,8 +58,12 @@ function registerEvents(io: SessionsSocketServer) {
     sessionStore.updateSession(socket.data.sessionId, { connected: true });
 
     socket.join(socket.data.sessionId);
+    socket.join(socket.data.peerSessionId);
 
-    io.emit('chat', { sender: 'Server', text: 'A user connected' });
+    io.to(socket.data.peerSessionId).emit('chat', {
+      sender: 'Server',
+      text: 'A user connected',
+    });
 
     socket.on('chat', (message) => {
       logger.info(`${message.sender} sent chat: ${message.text}`);

@@ -10,6 +10,7 @@ const URL =
 
 type SocketContextProviderProps = {
   children: React.ReactNode;
+  peerSessionId?: string;
 };
 
 type SocketContext = {
@@ -24,8 +25,9 @@ const SocketContext = createContext<SocketContext | null>(null);
 
 export function SocketContextProvider({
   children,
+  peerSessionId,
 }: SocketContextProviderProps) {
-  const { socket, isConnected, transport } = useSocket();
+  const { socket, isConnected, transport } = useSocket(peerSessionId);
 
   if (!socket) {
     return <div className="min-h-screen bg-red-800">Loading</div>;
@@ -58,7 +60,7 @@ export function useSocketClient() {
   };
 }
 
-function useSocket() {
+function useSocket(peerSessionId?: string) {
   const [socket, setSocket] = useState<SessionsSocketClient | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState<string>('N/A');
@@ -73,6 +75,7 @@ function useSocket() {
       autoConnect: false,
       auth: {
         sessionId: localStorage.getItem('sessionId'),
+        peerSessionId,
       },
     });
 

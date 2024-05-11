@@ -27,6 +27,7 @@ export type InterServerEvents = {
 
 export type SocketData = {
   sessionId: string;
+  peerSessionId?: string;
   session: SocketSession;
 };
 
