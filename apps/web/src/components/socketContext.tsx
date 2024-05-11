@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import Cookies from 'js-cookie';
 import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
 
 // "undefined" means the URL will be computed from the `window.location` object
@@ -74,7 +75,7 @@ function useSocket(peerSessionId?: string) {
     const newSocket = io(URL!, {
       autoConnect: false,
       auth: {
-        sessionId: localStorage.getItem('sessionId'),
+        sessionId: Cookies.get('sessionId'),
         peerSessionId,
       },
     });
@@ -117,8 +118,8 @@ function useSocket(peerSessionId?: string) {
 function registerCustomListeners(socket: SessionsSocketClient) {
   // typed quickly - think about it
   function onSession(session: Pick<SocketSession, 'id'>) {
-    console.log(`received session id: ${session.id} - storing in localStorage`);
-    localStorage.setItem('sessionId', session.id);
+    console.log(`received session id: ${session.id} - storing in cookies`);
+    Cookies.set('sessionId', session.id);
   }
 
   socket.on('session', onSession);
