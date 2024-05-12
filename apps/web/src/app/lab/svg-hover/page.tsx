@@ -1,5 +1,5 @@
-import { CardHoverSvgEffect } from '@sessions/effects';
+import { SvgEffectDemo } from '@sessions/effects';
 
 export default function SvgHoverPage() {
-  return <CardHoverSvgEffect />;
+  return <SvgEffectDemo />;
 }

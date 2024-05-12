@@ -35,7 +35,9 @@ export class InMemorySessionStore {
     const currentSession = this.sessions.get(sessionId);
 
     if (!currentSession) {
-      throw new Error(`Session with ID ${sessionId} does not exist.`);
+      this.logger.error(
+        `Failed to update session with ID ${sessionId} - session does not exist.`,
+      );
     }
 
     this.sessions.set(sessionId, { ...currentSession, ...session });
