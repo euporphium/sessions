@@ -10,13 +10,16 @@ const sessionStore = new InMemorySessionStore(logger);
 export function addSocketServer(server: http.Server) {
   logger.verbose('adding socket server');
 
-  const serverOptions = { cors: { origin: 'http://localhost:3000' } };
+  const origin =
+    process.env.NODE_ENV === 'production'
+      ? 'http://194.195.208.18:3000'
+      : 'http://localhost:3000';
+
+  const serverOptions = { cors: { origin } };
   const io: SessionsSocketServer = new Server(server, serverOptions);
 
   registerSessionMiddleware(io);
   registerEvents(io);
-
-  return io;
 }
 
 function registerSessionMiddleware(io: SessionsSocketServer) {

@@ -4,6 +4,9 @@
   "sourceRoot": "app/web",
   "projectType": "application",
   "tags": ["type:next", "type:react"],
-  "// targets": "to see all targets run: nx show project web --web",
-  "targets": {}
+  "targets": {
+    "docker-build": {
+      "command": "docker build -f apps/web/Dockerfile . -t web"
+    }
+  }
 }

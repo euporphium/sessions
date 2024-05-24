@@ -5,9 +5,15 @@ import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
 import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
 
-// "undefined" means the URL will be computed from the `window.location` object
-const URL =
-  process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:3333';
+const url = () => {
+  if (process.env.NODE_ENV === 'production') {
+    const url = new URL(window.location.origin);
+    url.port = '3333';
+    return url.toString();
+  }
+
+  return 'http://localhost:3333';
+};
 
 type SocketContextProviderProps = {
   children: React.ReactNode;
@@ -72,7 +78,7 @@ function useSocket(peerSessionId?: string) {
       return;
     }
 
-    const newSocket = io(URL!, {
+    const newSocket = io(url()!, {
       autoConnect: false,
       auth: {
         sessionId: Cookies.get('sessionId'),

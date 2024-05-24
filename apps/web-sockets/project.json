@@ -19,6 +19,9 @@
           "buildTarget": "web-sockets:build:production"
         }
       }
+    },
+    "docker-build": {
+      "command": "docker build -f apps/web-sockets/Dockerfile . -t web-sockets"
     }
   }
 }
