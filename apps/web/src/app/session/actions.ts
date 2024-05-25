@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { z } from 'zod';
-import db, { sessions } from '../../../db';
+import db, { sessionParticipants, sessions } from '../../../db';
 
 export async function getAuthenticatedUser() {
   const { getUser } = getKindeServerSession();
@@ -49,14 +49,23 @@ export async function createSession(formData: FormData) {
     return err;
   }
 
-  const [result] = await db
-    .insert(sessions)
-    .values({
-      ...validatedFormData.data,
-      createdBy: user.id,
-    })
-    .returning({ id: sessions.id, slug: sessions.slug });
+  const result = await db.transaction(async (trx) => {
+    const [{ sessionId, slug }] = await trx
+      .insert(sessions)
+      .values({
+        ...validatedFormData.data,
+        createdBy: user.id,
+      })
+      .returning({ sessionId: sessions.id, slug: sessions.slug });
 
-  console.log('New session created with id:', result.id);
+    await trx.insert(sessionParticipants).values({
+      sessionId,
+      userId: user.id,
+      isHost: true,
+    });
+
+    return { slug };
+  });
+
   redirect(`/session/${result.slug}`);
 }

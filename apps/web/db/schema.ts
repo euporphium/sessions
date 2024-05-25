@@ -1,5 +1,6 @@
 import {
   boolean,
+  integer,
   pgTable,
   serial,
   timestamp,
@@ -25,4 +26,10 @@ export const sessions = pgTable('sessions', {
     .notNull(),
   startedAt: timestamp('started_at').notNull().defaultNow(),
   endedAt: timestamp('ended_at'),
+});
+
+export const sessionParticipants = pgTable('session_participants', {
+  sessionId: integer('session_id').references(() => sessions.id),
+  userId: varchar('user_id', { length: 100 }).references(() => users.id),
+  isHost: boolean('is_host').notNull().default(false),
 });
