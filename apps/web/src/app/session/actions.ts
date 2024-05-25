@@ -50,6 +50,17 @@ export async function createSession(formData: FormData) {
   }
 
   const result = await db.transaction(async (trx) => {
+    const activeWithSlug = await trx.query.sessions.findFirst({
+      where: (sessions, { eq }) =>
+        eq(sessions.active, true) &&
+        eq(sessions.slug, validatedFormData.data.slug),
+    });
+
+    if (activeWithSlug) {
+      trx.rollback();
+      return { errors: { slug: ['Slug already in use'] } };
+    }
+
     const [{ sessionId, slug }] = await trx
       .insert(sessions)
       .values({
