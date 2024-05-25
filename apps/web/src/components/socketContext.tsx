@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
 
 const url = () => {
+  // TODO update this to used typed env
   if (process.env.NODE_ENV === 'production') {
     const url = new URL(window.location.origin);
     url.port = '3333';
