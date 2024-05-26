@@ -32,4 +32,7 @@ USER socketio
 EXPOSE 3333
 ENV PORT 3333
 ENV NODE_ENV production
+ENV LOG_LEVEL=info
+ENV CORS_ORIGIN=http://localhost:3000
+#ENV CORS_ORIGIN=http://194.195.208.18:3000
 CMD ["node", "main.js"]

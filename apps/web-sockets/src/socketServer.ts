@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import { SessionsSocketServer } from '@sessions/web-types';
 import { InMemorySessionStore } from './sessionStore';
 import { getLogger } from './logger';
+import env from '../env';
 
 const logger = getLogger();
 const sessionStore = new InMemorySessionStore(logger);
@@ -10,10 +11,7 @@ const sessionStore = new InMemorySessionStore(logger);
 export function addSocketServer(server: http.Server) {
   logger.verbose('adding socket server');
 
-  const origin =
-    process.env.NODE_ENV === 'production'
-      ? 'http://194.195.208.18:3000'
-      : 'http://localhost:3000';
+  const origin = env.CORS_ORIGIN;
 
   const serverOptions = { cors: { origin } };
   const io: SessionsSocketServer = new Server(server, serverOptions);

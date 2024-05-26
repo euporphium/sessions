@@ -1,4 +1,5 @@
 import winston, { format } from 'winston';
+import env from '../env';
 
 export type Logger = Pick<
   winston.Logger,
@@ -12,7 +13,7 @@ export function getLogger() {
     const { combine, timestamp, colorize, align, printf } = format;
 
     const logger = winston.createLogger({
-      level: process.env.LOG_LEVEL || 'debug',
+      level: env.LOG_LEVEL,
       format: combine(
         colorize({ all: true }),
         timestamp({ format: 'YYYY-MM-DD hh:mm:ss.SSS A' }),
