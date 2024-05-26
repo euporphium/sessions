@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { z } from 'zod';
-import db, { sessionParticipants, sessions } from '../../../db';
+import db, { sessions, sessionParticipants } from '../../../db';
 
 export async function getAuthenticatedUser() {
   const { getUser } = getKindeServerSession();

@@ -1,13 +1,16 @@
 import type { Server } from 'socket.io';
 import type { Socket } from 'socket.io-client';
 
-export type SocketSession = {
+export type SocketConnection = {
   id: string;
   connected: boolean;
 };
 
 export type ChatMessage = {
-  sender: string;
+  sender: {
+    id: string;
+    name: string;
+  };
   text: string;
 };
 
@@ -17,7 +20,7 @@ export type ClientToServerEvents = {
 };
 
 export type ServerToClientEvents = {
-  session: (session: Pick<SocketSession, 'id'>) => void; // typed quickly - think about it
+  session: (session: Pick<SocketConnection, 'id'>) => void; // typed quickly - think about it
   chat: (message: ChatMessage) => void;
 };
 
@@ -26,9 +29,9 @@ export type InterServerEvents = {
 };
 
 export type SocketData = {
-  sessionId: string;
-  peerSessionId?: string;
-  session: SocketSession;
+  connectionId: string;
+  sessionCode?: string;
+  session: SocketConnection;
 };
 
 export type SessionsSocketServer = Server<

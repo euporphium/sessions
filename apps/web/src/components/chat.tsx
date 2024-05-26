@@ -2,22 +2,29 @@
 
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
+import type { ChatMessage } from '@sessions/web-types';
+import { cn } from '../../../../libs/ui/effects/src/lib/cn';
 
-export default function Chat() {
+type ChatProps = {
+  user: {
+    id: string;
+    name: string;
+  };
+};
+
+export default function Chat({ user }: ChatProps) {
   const {
     socket,
     meta: { isConnected },
   } = useSocketClient();
-  const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
-    [],
-  );
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     if (!socket) {
       return;
     }
 
-    function onChat(message: { sender: string; text: string }) {
+    function onChat(message: ChatMessage) {
       setMessages((prev) => [...prev, message]);
     }
 
@@ -39,42 +46,48 @@ export default function Chat() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     // TODO always validation
-    const name = formData.get('name') as string;
     const message = formData.get('message') as string;
-    const chatMessage = { sender: name, text: message };
+    const chatMessage = { sender: user, text: message };
 
-    setMessages((prev) => [...prev, { sender: 'You', text: message }]);
+    setMessages((prev) => [...prev, { sender: user, text: message }]);
+    form.reset();
 
     socket.emit('chat', chatMessage);
   }
 
   return (
-    <div className="grid max-w-lg gap-4 bg-gray-300 p-4">
+    <div className="grid gap-4 bg-gray-300 p-4">
       <ul className="flex flex-col gap-2">
         {messages.map((message, i) => (
           <li
             key={i}
-            className={
-              message.sender === 'You'
-                ? 'self-end bg-blue-400 p-2'
-                : 'self-start bg-green-400 p-2'
-            }
+            className={cn(
+              'max-w-64 rounded p-2',
+              message.sender.id === user.id
+                ? 'self-end bg-gray-400'
+                : 'self-start bg-blue-400',
+            )}
           >
-            <strong>{message.sender}</strong>: {message.text}
+            <strong>{message.sender.name}</strong>: {message.text}
           </li>
         ))}
       </ul>
       {isConnected && (
         <form className="" onSubmit={submitHandler}>
-          <label htmlFor="name">Name</label>
-          <input type="text" name="name" />
+          <div className="flex gap-2">
+            <label htmlFor="message" className="sr-only">
+              Chat Message
+            </label>
+            <input
+              type="text"
+              name="message"
+              className="flex-grow rounded p-2"
+            />
 
-          <label htmlFor="message">Message</label>
-          <input type="text" name="message" />
-
-          <button type="submit" className="bg-blue-200 p-2">
-            Send
-          </button>
+            <button type="submit" className="rounded bg-blue-400 p-2">
+              Send
+            </button>
+          </div>
         </form>
       )}
     </div>

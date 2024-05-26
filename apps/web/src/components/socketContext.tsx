@@ -3,12 +3,15 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
-import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
+import type {
+  SessionsSocketClient,
+  SocketConnection,
+} from '@sessions/web-types';
 import { env } from '../env';
 
 type SocketContextProviderProps = {
   children: React.ReactNode;
-  peerSessionId?: string;
+  sessionCode?: string;
   autoConnect?: boolean;
 };
 
@@ -24,11 +27,11 @@ const SocketContext = createContext<SocketContext | null>(null);
 
 export function SocketContextProvider({
   children,
-  peerSessionId,
+  sessionCode,
   autoConnect = false,
 }: SocketContextProviderProps) {
   const { socket, isConnected, transport } = useSocket(
-    peerSessionId,
+    sessionCode,
     autoConnect,
   );
 
@@ -63,7 +66,7 @@ export function useSocketClient() {
   };
 }
 
-function useSocket(peerSessionId?: string, autoConnect = false) {
+function useSocket(sessionCode?: string, autoConnect = false) {
   const [socket, setSocket] = useState<SessionsSocketClient | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState<string>('N/A');
@@ -77,8 +80,8 @@ function useSocket(peerSessionId?: string, autoConnect = false) {
     const newSocket = io(env.client.NEXT_PUBLIC_SOCKET_SERVER_URL, {
       autoConnect: autoConnect,
       auth: {
-        sessionId: Cookies.get('sessionId'),
-        peerSessionId,
+        connectionId: Cookies.get('connectionId'),
+        sessionCode,
       },
     });
 
@@ -119,7 +122,7 @@ function useSocket(peerSessionId?: string, autoConnect = false) {
 
 function registerCustomListeners(socket: SessionsSocketClient) {
   // typed quickly - think about it
-  function onSession(session: Pick<SocketSession, 'id'>) {
+  function onSession(session: Pick<SocketConnection, 'id'>) {
     console.log(`received session id: ${session.id} - storing in cookies`);
     Cookies.set('sessionId', session.id);
   }

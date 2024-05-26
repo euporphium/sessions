@@ -1,12 +1,12 @@
 import http from 'http';
 import { Server } from 'socket.io';
 import { SessionsSocketServer } from '@sessions/web-types';
-import { InMemorySessionStore } from './sessionStore';
+import { InMemoryConnectionStore } from './sessionStore';
 import { getLogger } from './logger';
 import env from '../env';
 
 const logger = getLogger();
-const sessionStore = new InMemorySessionStore(logger);
+const connectionStore = new InMemoryConnectionStore(logger);
 
 export function addSocketServer(server: http.Server) {
   logger.verbose('adding socket server');
@@ -16,58 +16,62 @@ export function addSocketServer(server: http.Server) {
   const serverOptions = { cors: { origin } };
   const io: SessionsSocketServer = new Server(server, serverOptions);
 
-  registerSessionMiddleware(io);
+  registerConnectionMiddleware(io);
   registerEvents(io);
 }
 
-function registerSessionMiddleware(io: SessionsSocketServer) {
-  logger.verbose('registering session middleware');
+function registerConnectionMiddleware(io: SessionsSocketServer) {
+  logger.verbose('registering connection middleware');
 
   io.use((socket, next) => {
-    const { sessionId, peerSessionId } = socket.handshake.auth;
+    const { connectionId, sessionCode } = socket.handshake.auth;
 
-    if (sessionId) {
-      logger.verbose(`checking for session: ${sessionId}`);
-      const session = sessionStore.findSession(sessionId);
+    if (connectionId) {
+      logger.verbose(`checking for connection: ${connectionId}`);
+      const connection = connectionStore.findConnection(connectionId);
 
-      if (session) {
-        logger.verbose(`session found: ${session.id}`);
-        socket.data.sessionId = session.id;
+      if (connection) {
+        logger.verbose(`connection found: ${connection.id}`);
+        socket.data.connectionId = connection.id;
       } else {
-        logger.verbose(`session not found: ${sessionId}`);
-        socket.data.sessionId = sessionStore.createSession();
+        logger.verbose(`connection not found: ${connectionId}`);
+        socket.data.connectionId = connectionStore.createConnection();
       }
     } else {
-      logger.verbose('no session id provided');
-      socket.data.sessionId = sessionStore.createSession();
+      logger.verbose('no connection id provided');
+      socket.data.connectionId = connectionStore.createConnection();
     }
 
-    socket.data.peerSessionId = peerSessionId;
+    socket.data.sessionCode = sessionCode;
 
-    socket.emit('session', { id: socket.data.sessionId });
+    socket.emit('session', { id: socket.data.connectionId });
 
     next();
   });
 }
 
 function registerEvents(io: SessionsSocketServer) {
+  // const serverUser = { id: 'SERVER', name: 'Server' };
+
   logger.verbose('registering events');
 
   io.on('connection', (socket) => {
-    logger.verbose(`socket connected with session: ${socket.data.sessionId}`);
+    logger.verbose(`connected to: ${socket.data.connectionId}`);
 
-    sessionStore.updateSession(socket.data.sessionId, { connected: true });
-
-    socket.join(socket.data.sessionId);
-    socket.join(socket.data.peerSessionId);
-
-    io.to(socket.data.peerSessionId).emit('chat', {
-      sender: 'Server',
-      text: 'A user connected',
+    connectionStore.updateConnection(socket.data.connectionId, {
+      connected: true,
     });
 
+    socket.join(socket.data.connectionId);
+    socket.join(socket.data.sessionCode);
+
+    // io.to(socket.data.sessionCode).emit('chat', {
+    //   sender: serverUser,
+    //   text: 'A user connected',
+    // });
+
     socket.on('chat', (message) => {
-      logger.info(`${message.sender} sent chat: ${message.text}`);
+      logger.info(`${message.sender.name} sent chat: ${message.text}`);
       socket.broadcast.emit('chat', message);
     });
 
@@ -77,13 +81,12 @@ function registerEvents(io: SessionsSocketServer) {
       const matchingSockets = await io.in(socket.id).fetchSockets();
       const isDisconnected = matchingSockets.length === 0;
       if (isDisconnected) {
-        sessionStore.updateSession(socket.data.sessionId, { connected: false });
+        connectionStore.updateConnection(socket.data.connectionId, {
+          connected: false,
+        });
       }
 
-      io.emit('chat', {
-        sender: 'Server',
-        text: 'A user disconnected',
-      });
+      // io.emit('chat', { sender: serverUser, text: 'A user disconnected' });
     });
   });
 }

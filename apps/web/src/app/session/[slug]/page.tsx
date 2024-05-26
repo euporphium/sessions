@@ -28,9 +28,13 @@ export default async function SessionPage({ params }: SessionPageProps) {
   const isHost = session.hostId === user.id;
 
   return (
-    <SocketContextProvider peerSessionId={session.slug} autoConnect>
+    <SocketContextProvider sessionCode={session.slug} autoConnect>
       Welcome to {session.name}
-      {isHost ? <HostSession /> : <ParticipantSession />}
+      {isHost ? (
+        <HostSession user={{ id: user.id, name: user.firstName }} />
+      ) : (
+        <ParticipantSession user={{ id: user.id, name: user.firstName }} />
+      )}
     </SocketContextProvider>
   );
 }

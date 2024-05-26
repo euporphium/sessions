@@ -3,15 +3,15 @@ import Chat from '../../../components/chat';
 import { SocketContextProvider } from '../../../components/socketContext';
 
 type QueryParams = {
-  peerSessionId: string;
+  sessionCode: string;
 };
 
 export default async function Index({ params }: { params: QueryParams }) {
   return (
     <div>
-      <SocketContextProvider peerSessionId={params.peerSessionId}>
+      <SocketContextProvider sessionCode={params.sessionCode}>
         <ConnectionManager />
-        <Chat />
+        {/*<Chat />*/}
       </SocketContextProvider>
     </div>
   );

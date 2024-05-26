@@ -1,49 +1,49 @@
-import type { SocketSession } from '@sessions/web-types';
+import type { SocketConnection } from '@sessions/web-types';
 import type { Logger } from './logger';
 
-export class InMemorySessionStore {
+export class InMemoryConnectionStore {
   logger: Logger;
-  sessions: Map<string, SocketSession>;
+  connections: Map<string, SocketConnection>;
 
   constructor(logger: Logger) {
     this.logger = logger;
-    this.logger.verbose('initializing in-memory session store');
-    this.sessions = new Map();
+    this.logger.verbose('initializing in-memory connection store');
+    this.connections = new Map();
   }
 
-  createSession() {
+  createConnection() {
     const newId = crypto.randomUUID();
-    this.saveSession(newId, { id: newId, connected: false });
-    this.logger.verbose(`creating session with id: ${newId}`);
+    this.saveConnection(newId, { id: newId, connected: false });
+    this.logger.verbose(`creating connection: ${newId}`);
     return newId;
   }
 
-  findSession(id: string) {
-    return this.sessions.get(id);
+  findConnection(id: string) {
+    return this.connections.get(id);
   }
 
-  saveSession(sessionId: string, session: SocketSession) {
-    this.sessions.set(sessionId, session);
+  saveConnection(connectionId: string, connection: SocketConnection) {
+    this.connections.set(connectionId, connection);
 
-    this.logger.debug(this.findAllSessions());
+    this.logger.debug(this.findAllConnections());
   }
 
-  updateSession(
-    sessionId: string,
-    session: Partial<Omit<SocketSession, 'id'>>,
+  updateConnection(
+    connectionId: string,
+    connection: Partial<Omit<SocketConnection, 'id'>>,
   ) {
-    const currentSession = this.sessions.get(sessionId);
+    const currentConnection = this.connections.get(connectionId);
 
-    if (!currentSession) {
+    if (!currentConnection) {
       this.logger.error(
-        `Failed to update session with ID ${sessionId} - session does not exist.`,
+        `Failed to connection ${connectionId} - it does not exist`,
       );
     }
 
-    this.sessions.set(sessionId, { ...currentSession, ...session });
+    this.connections.set(connectionId, { ...currentConnection, ...connection });
   }
 
-  findAllSessions() {
-    return [...this.sessions.values()];
+  findAllConnections() {
+    return [...this.connections.values()];
   }
 }
