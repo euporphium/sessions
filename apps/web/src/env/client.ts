@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 export const env = createEnv({
   client: {
-    // ADD_CLIENT_ENV_VARIABLES_HERE: process.env.ADD_CLIENT_ENV_VARIABLES_HERE,
+    NEXT_PUBLIC_SOCKET_SERVER_URL: z.string().url(),
   },
   experimental__runtimeEnv: {
-    // ADD_CLIENT_ENV_VARIABLES_HERE: process.env.ADD_CLIENT_ENV_VARIABLES_HERE,
+    NEXT_PUBLIC_SOCKET_SERVER_URL: process.env.NEXT_PUBLIC_SOCKET_SERVER_URL,
   },
 });

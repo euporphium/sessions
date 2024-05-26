@@ -4,17 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
 import type { SessionsSocketClient, SocketSession } from '@sessions/web-types';
-
-const url = () => {
-  // TODO update this to used typed env
-  if (process.env.NODE_ENV === 'production') {
-    const url = new URL(window.location.origin);
-    url.port = '3333';
-    return url.toString();
-  }
-
-  return 'http://localhost:3333';
-};
+import { env } from '../env';
 
 type SocketContextProviderProps = {
   children: React.ReactNode;
@@ -79,7 +69,7 @@ function useSocket(peerSessionId?: string) {
       return;
     }
 
-    const newSocket = io(url()!, {
+    const newSocket = io(env.client.NEXT_PUBLIC_SOCKET_SERVER_URL, {
       autoConnect: false,
       auth: {
         sessionId: Cookies.get('sessionId'),
