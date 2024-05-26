@@ -20,6 +20,21 @@ export async function getAuthenticatedUser() {
   return user ?? null;
 }
 
+export async function getUserSessions(userId: string) {
+  return db.query.sessionParticipants.findMany({
+    where: (sessionParticipants, { eq }) =>
+      eq(sessionParticipants.userId, userId),
+    with: { session: true },
+  });
+}
+
+export async function getSessionBySlug(slug: string) {
+  return db.query.sessions.findFirst({
+    where: (sessions, { eq }) => eq(sessions.slug, slug),
+    with: { sessionParticipants: true },
+  });
+}
+
 export async function createSession(formData: FormData) {
   const user = await getAuthenticatedUser();
   if (!user) {
@@ -50,29 +65,31 @@ export async function createSession(formData: FormData) {
   }
 
   const result = await db.transaction(async (trx) => {
+    // Check if the slug is currently in use
     const activeWithSlug = await trx.query.sessions.findFirst({
-      where: (sessions, { eq }) =>
-        eq(sessions.active, true) &&
-        eq(sessions.slug, validatedFormData.data.slug),
+      where: (sessions, { eq, isNull }) =>
+        eq(sessions.slug, validatedFormData.data.slug) &&
+        isNull(sessions.endedAt),
     });
 
+    // If the slug is in use, return an error
     if (activeWithSlug) {
       trx.rollback();
       return { errors: { slug: ['Slug already in use'] } };
     }
 
+    // Create the session
     const [{ sessionId, slug }] = await trx
       .insert(sessions)
       .values({
         ...validatedFormData.data,
-        createdBy: user.id,
+        hostId: user.id,
       })
       .returning({ sessionId: sessions.id, slug: sessions.slug });
 
     await trx.insert(sessionParticipants).values({
       sessionId,
       userId: user.id,
-      isHost: true,
     });
 
     return { slug };
