@@ -1,5 +1,5 @@
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import db, { users } from '../../../../../db';
 import { z } from 'zod';
 
@@ -19,7 +19,7 @@ const kindeUserSchema = z.object({
   picture: z.preprocess(nullify, z.string().url().nullish()),
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const { getUser } = getKindeServerSession();
   const kindeUser = await getUser();
 
@@ -45,5 +45,5 @@ export async function GET() {
     });
   }
 
-  return NextResponse.redirect('http://localhost:3000/session');
+  return NextResponse.redirect(request.nextUrl.searchParams.get('next') ?? '/');
 }

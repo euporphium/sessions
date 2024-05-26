@@ -9,6 +9,7 @@ import { env } from '../env';
 type SocketContextProviderProps = {
   children: React.ReactNode;
   peerSessionId?: string;
+  autoConnect?: boolean;
 };
 
 type SocketContext = {
@@ -24,8 +25,12 @@ const SocketContext = createContext<SocketContext | null>(null);
 export function SocketContextProvider({
   children,
   peerSessionId,
+  autoConnect = false,
 }: SocketContextProviderProps) {
-  const { socket, isConnected, transport } = useSocket(peerSessionId);
+  const { socket, isConnected, transport } = useSocket(
+    peerSessionId,
+    autoConnect,
+  );
 
   if (!socket) {
     return <div className="min-h-screen bg-red-800">Loading</div>;
@@ -58,7 +63,7 @@ export function useSocketClient() {
   };
 }
 
-function useSocket(peerSessionId?: string) {
+function useSocket(peerSessionId?: string, autoConnect = false) {
   const [socket, setSocket] = useState<SessionsSocketClient | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState<string>('N/A');
@@ -70,7 +75,7 @@ function useSocket(peerSessionId?: string) {
     }
 
     const newSocket = io(env.client.NEXT_PUBLIC_SOCKET_SERVER_URL, {
-      autoConnect: false,
+      autoConnect: autoConnect,
       auth: {
         sessionId: Cookies.get('sessionId'),
         peerSessionId,
