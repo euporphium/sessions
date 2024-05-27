@@ -7,6 +7,20 @@
   "targets": {
     "docker-build": {
       "command": "docker build -f apps/web/Dockerfile . -t web"
+    },
+    "drizzle-push": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/web",
+        "command": "dotenvx run -f .env.local -- drizzle-kit push"
+      }
+    },
+    "drizzle-studio": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/web",
+        "command": "dotenvx run -f .env.local -- drizzle-kit studio"
+      }
     }
   }
 }
