@@ -68,9 +68,11 @@ export async function createSession(formData: FormData) {
   const result = await db.transaction(async (trx) => {
     // Check if the slug is currently in use
     const activeWithSlug = await trx.query.sessions.findFirst({
-      where: (sessions, { eq, isNull }) =>
-        eq(sessions.slug, validatedFormData.data.slug) &&
-        isNull(sessions.endedAt),
+      where: (sessions, { eq, isNull, and }) =>
+        and(
+          eq(sessions.slug, validatedFormData.data.slug),
+          isNull(sessions.endedAt),
+        ),
     });
 
     // If the slug is in use, return an error
