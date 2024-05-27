@@ -1,7 +1,7 @@
 import { getAuthenticatedUser, getSessionBySlug } from '../actions';
 import { notFound, redirect } from 'next/navigation';
 import { SocketContextProvider } from '../../../components/socketContext';
-import HostSession from '../../../components/hostSession';
+import AdminSession from '../../../components/adminSession';
 import ParticipantSession from '../../../components/participantSession';
 import { env } from '../../../env';
 
@@ -25,13 +25,16 @@ export default async function SessionPage({ params }: SessionPageProps) {
     notFound();
   }
 
-  const isHost = session.hostId === user.id;
+  const participant = session.sessionParticipants.find(
+    (p) => p.userId === user.id,
+  );
+  const isAdmin = participant?.role === 'admin';
 
   return (
     <SocketContextProvider userId={user.id} autoConnect>
       Welcome to {session.name}
-      {isHost ? (
-        <HostSession
+      {isAdmin ? (
+        <AdminSession
           user={{ id: user.id, name: user.firstName }}
           session={session}
         />

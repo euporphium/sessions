@@ -20,7 +20,7 @@ type HostSessionProps = {
   };
 };
 
-export default function HostSession({ user, session }: HostSessionProps) {
+export default function AdminSession({ user, session }: HostSessionProps) {
   const [accessRequests, setAccessRequests] = useState<string[]>([]);
   const { socket } = useSocketClient();
 

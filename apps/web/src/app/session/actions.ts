@@ -84,15 +84,13 @@ export async function createSession(formData: FormData) {
     // Create the session
     const [{ sessionId, slug }] = await trx
       .insert(sessions)
-      .values({
-        ...validatedFormData.data,
-        hostId: user.id,
-      })
+      .values(validatedFormData.data)
       .returning({ sessionId: sessions.id, slug: sessions.slug });
 
     await trx.insert(sessionParticipants).values({
       sessionId,
       userId: user.id,
+      role: 'admin',
     });
 
     return { slug };

@@ -24,9 +24,6 @@ export const sessions = pgTable('sessions', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   slug: varchar('slug', { length: 100 }).notNull(),
-  hostId: varchar('host_id', { length: 100 })
-    .references(() => users.id)
-    .notNull(),
   startedAt: timestamp('started_at').notNull().defaultNow(),
   endedAt: timestamp('ended_at'),
 });
@@ -44,6 +41,7 @@ export const sessionParticipants = pgTable(
     userId: varchar('user_id', { length: 100 })
       .references(() => users.id)
       .notNull(),
+    role: varchar('role', { length: 50 }).default('user'),
   },
   () => ({
     primaryKey: {
