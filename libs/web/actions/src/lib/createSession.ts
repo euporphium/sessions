@@ -1,40 +1,9 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { z } from 'zod';
-import { db, sessions, sessionParticipants } from '@sessions/web-db';
-import { eq } from 'drizzle-orm';
-
-export async function getAuthenticatedUser() {
-  const { getUser } = getKindeServerSession();
-  const kindeUser = await getUser();
-
-  if (!kindeUser) {
-    return null;
-  }
-
-  const user = await db.instance.query.users.findFirst({
-    where: (users, { eq }) => eq(users.id, kindeUser.id),
-  });
-
-  return user ?? null;
-}
-
-export async function getUserSessions(userId: string) {
-  return db.instance.query.sessionParticipants.findMany({
-    where: (sessionParticipants, { eq }) =>
-      eq(sessionParticipants.userId, userId),
-    with: { session: true },
-  });
-}
-
-export async function getSessionBySlug(slug: string) {
-  return db.instance.query.sessions.findFirst({
-    where: (sessions, { eq }) => eq(sessions.slug, slug),
-    with: { sessionParticipants: true },
-  });
-}
+import { getAuthenticatedUser } from '@sessions/web-actions';
+import { db, sessionParticipants, sessions } from '@sessions/web-db';
 
 export async function createSession(formData: FormData) {
   const user = await getAuthenticatedUser();
@@ -97,16 +66,4 @@ export async function createSession(formData: FormData) {
   });
 
   redirect(`/session/${result.slug}`);
-}
-
-export async function endSession(id: number) {
-  return db.instance
-    .update(sessions)
-    .set({ endedAt: new Date() })
-    .where(eq(sessions.id, id))
-    .returning({ slug: sessions.slug });
-}
-
-export async function addParticipant(sessionId: number, userId: string) {
-  return db.instance.insert(sessionParticipants).values({ sessionId, userId });
 }

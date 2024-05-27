@@ -1,9 +1,9 @@
 'use client';
 
 import Chat from './chat';
-import { addParticipant, endSession } from '../app/session/actions';
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
+import { addSessionParticipant, endSession } from '@sessions/web-actions';
 
 type HostSessionProps = {
   user: {
@@ -47,7 +47,7 @@ export default function AdminSession({ user, session }: HostSessionProps) {
 
   async function approveAccess(userId: string) {
     console.log('Approving access for', userId);
-    await addParticipant(session.id, userId);
+    await addSessionParticipant(userId, session.id);
     setAccessRequests((prev) => prev.filter((id) => id !== userId));
     socket.emit('grantAccess', { roomId: session.slug, userId });
   }

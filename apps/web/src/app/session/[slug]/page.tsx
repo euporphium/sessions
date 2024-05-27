@@ -1,9 +1,9 @@
-import { getAuthenticatedUser, getSessionBySlug } from '../actions';
 import { notFound, redirect } from 'next/navigation';
 import { SocketContextProvider } from '../../../components/socketContext';
 import AdminSession from '../../../components/adminSession';
 import ParticipantSession from '../../../components/participantSession';
 import { env } from '../../../env';
+import { getAuthenticatedUser, getSessionBySlug } from '@sessions/web-actions';
 
 type SessionPageProps = {
   params: { slug: string };

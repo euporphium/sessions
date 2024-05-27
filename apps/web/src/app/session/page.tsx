@@ -3,7 +3,7 @@ import {
   getKindeServerSession,
   LogoutLink,
 } from '@kinde-oss/kinde-auth-nextjs/server';
-import { createSession, getAuthenticatedUser } from './actions';
+import { createSession, getAuthenticatedUser } from '@sessions/web-actions';
 
 export default async function SessionCreationPage() {
   const { isAuthenticated } = getKindeServerSession();
