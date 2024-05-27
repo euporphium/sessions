@@ -2,12 +2,12 @@
 
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
-import type { ChatMessage, SessionWithAdmins, User } from '@sessions/web-types';
+import type { ChatMessage, SessionWithUsers, User } from '@sessions/web-types';
 import { cn } from '../../../../libs/ui/effects/src/lib/cn';
 
 type ChatProps = {
   user: User;
-  session: SessionWithAdmins;
+  session: SessionWithUsers;
 };
 
 export default function Chat({ user, session }: ChatProps) {

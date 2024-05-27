@@ -1,8 +1,10 @@
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db, users } from '@sessions/web-db';
 import { z } from 'zod';
 import { env } from '../../../../env';
+
+export const dynamic = 'force-dynamic';
 
 // TODO: move to a shared location - 😎
 function nullify(value: unknown) {
