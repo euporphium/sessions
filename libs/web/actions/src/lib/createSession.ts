@@ -2,7 +2,10 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { getAuthenticatedUser } from '@sessions/web-actions';
+import {
+  getAuthenticatedUser,
+  getSessionWithUsersBySlug,
+} from '@sessions/web-actions';
 import { db, sessionParticipants, sessions } from '@sessions/web-db';
 
 export async function createSession(formData: FormData) {
@@ -35,14 +38,9 @@ export async function createSession(formData: FormData) {
   }
 
   const result = await db.instance.transaction(async (trx) => {
-    // Check if the slug is currently in use
-    const activeWithSlug = await trx.query.sessions.findFirst({
-      where: (sessions, { eq, isNull, and }) =>
-        and(
-          eq(sessions.slug, validatedFormData.data.slug),
-          isNull(sessions.endedAt),
-        ),
-    });
+    const activeWithSlug = await getSessionWithUsersBySlug(
+      validatedFormData.data.slug,
+    );
 
     // If the slug is in use, return an error
     if (activeWithSlug) {

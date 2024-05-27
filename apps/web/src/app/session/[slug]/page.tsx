@@ -3,7 +3,10 @@ import { SocketContextProvider } from '../../../components/socketContext';
 import AdminSession from '../../../components/adminSession';
 import ParticipantSession from '../../../components/participantSession';
 import { env } from '../../../env';
-import { getAuthenticatedUser, getSessionBySlug } from '@sessions/web-actions';
+import {
+  getAuthenticatedUser,
+  getSessionWithUsersBySlug,
+} from '@sessions/web-actions';
 
 type SessionPageProps = {
   params: { slug: string };
@@ -20,14 +23,12 @@ export default async function SessionPage({ params }: SessionPageProps) {
     );
   }
 
-  const session = await getSessionBySlug(params.slug);
+  const session = await getSessionWithUsersBySlug(params.slug);
   if (!session || session.endedAt) {
     notFound();
   }
 
-  const participant = session.sessionParticipants.find(
-    (p) => p.userId === user.id,
-  );
+  const participant = session.users.find(({ id }) => id === user.id);
   const isAdmin = participant?.role === 'admin';
 
   return (

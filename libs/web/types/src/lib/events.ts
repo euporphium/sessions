@@ -1,4 +1,5 @@
-import { ChatMessage, SocketConnection } from './types';
+import { ChatMessage } from './types'; // TODO: move
+import type { AccessRequest } from './domain';
 
 export type ClientToServerEvents = {
   hello: () => void;
@@ -7,22 +8,15 @@ export type ClientToServerEvents = {
 
   joinRoom: (roomId: string) => void;
   leaveRoom: (roomId: string) => void;
-  requestAccess: ({
-    roomId,
-    userId,
-  }: {
-    roomId: string;
-    userId: string;
-  }) => void;
+  requestAccess: (accessRequest: AccessRequest) => void;
   grantAccess: ({ roomId, userId }: { roomId: string; userId: string }) => void;
 };
 
 export type ServerToClientEvents = {
-  session: (session: Pick<SocketConnection, 'userId'>) => void; // typed quickly - think about it
   chat: (message: ChatMessage) => void;
   endSession: () => void;
 
-  accessRequested: ({ userId }: { userId: string }) => void;
+  accessRequested: (accessRequest: AccessRequest) => void;
   accessGranted: ({ roomId }: { roomId: string }) => void;
 };
 

@@ -3,24 +3,18 @@
 import Chat from './chat';
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
-import {
-  type Session,
-  type SessionWithParticipants,
-  User,
-} from '@sessions/web-types';
+import type { SessionWithUsers, User } from '@sessions/web-types';
 
 type ParticipantSessionProps = {
   user: User;
-  session: SessionWithParticipants;
+  session: SessionWithUsers;
 };
 
 export default function ParticipantSession({
   user,
   session,
 }: ParticipantSessionProps) {
-  const alreadyParticipant = session.sessionParticipants.some(
-    (p) => p.userId === user.id,
-  );
+  const alreadyParticipant = session.users.some(({ id }) => id === user.id);
   const [isParticipant, setIsParticipant] = useState(alreadyParticipant);
   const { socket } = useSocketClient();
 
@@ -49,7 +43,12 @@ export default function ParticipantSession({
   }, [socket]);
 
   function requestAccess() {
-    socket.emit('requestAccess', { roomId: session.slug, userId: user.id });
+    const fullName = `${user.firstName} ${user.lastName}`;
+    socket.emit('requestAccess', {
+      roomId: session.slug,
+      userId: user.id,
+      userName: fullName,
+    });
   }
 
   return (

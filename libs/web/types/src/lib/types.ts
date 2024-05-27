@@ -1,8 +1,3 @@
-export type SocketConnection = {
-  userId: string;
-  connected: boolean;
-};
-
 export type ChatMessage = {
   sessionCode: string;
   sender: {

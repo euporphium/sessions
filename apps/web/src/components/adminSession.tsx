@@ -4,15 +4,19 @@ import Chat from './chat';
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
 import { addSessionParticipant, endSession } from '@sessions/web-actions';
-import type { User, SessionWithParticipants } from '@sessions/web-types';
+import type {
+  User,
+  SessionWithUsers,
+  AccessRequest,
+} from '@sessions/web-types';
 
 type HostSessionProps = {
   user: User;
-  session: SessionWithParticipants;
+  session: SessionWithUsers;
 };
 
 export default function AdminSession({ user, session }: HostSessionProps) {
-  const [accessRequests, setAccessRequests] = useState<string[]>([]);
+  const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);
   const { socket } = useSocketClient();
 
   useEffect(() => {
@@ -23,9 +27,10 @@ export default function AdminSession({ user, session }: HostSessionProps) {
     socket.emit('joinRoom', session.slug);
     socket.emit('joinRoom', `${session.slug}:host`);
 
-    function onAccessRequested({ userId }: { userId: string }) {
+    function onAccessRequested(accessRequest: AccessRequest) {
+      const { userId } = accessRequest;
       setAccessRequests((prev) =>
-        prev.includes(userId) ? prev : [...prev, userId],
+        prev.some((r) => r.userId === userId) ? prev : [...prev, accessRequest],
       );
     }
 
@@ -39,13 +44,13 @@ export default function AdminSession({ user, session }: HostSessionProps) {
   async function approveAccess(userId: string) {
     console.log('Approving access for', userId);
     await addSessionParticipant(userId, session.id);
-    setAccessRequests((prev) => prev.filter((id) => id !== userId));
+    setAccessRequests((prev) => prev.filter((r) => r.userId !== userId));
     socket.emit('grantAccess', { roomId: session.slug, userId });
   }
 
   function denyAccess(userId: string) {
     console.log('Denying access for', userId);
-    setAccessRequests((prev) => prev.filter((id) => id !== userId));
+    setAccessRequests((prev) => prev.filter((r) => r.userId !== userId));
   }
 
   async function handleEndSession() {
@@ -59,8 +64,10 @@ export default function AdminSession({ user, session }: HostSessionProps) {
       <div>
         <h2>Current Users</h2>
         <ul>
-          {session.sessionParticipants.map((p) => (
-            <li key={p.userId}>{p.userId}</li>
+          {session.users.map(({ id, firstName, lastName }) => (
+            <li key={id}>
+              {firstName} {lastName}
+            </li>
           ))}
         </ul>
       </div>
@@ -70,9 +77,9 @@ export default function AdminSession({ user, session }: HostSessionProps) {
           <p>No access requests</p>
         ) : (
           <ul>
-            {accessRequests.map((userId) => (
+            {accessRequests.map(({ userId, userName }) => (
               <li key={userId}>
-                <span>{userId}</span>
+                <span>{userName}</span>
                 <button
                   onClick={() => approveAccess(userId)}
                   className="rounded bg-green-400 p-2"

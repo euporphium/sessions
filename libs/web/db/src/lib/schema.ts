@@ -41,7 +41,7 @@ export const sessionParticipants = pgTable(
     userId: varchar('user_id', { length: 100 })
       .references(() => users.id)
       .notNull(),
-    role: varchar('role', { length: 50 }).default('user'),
+    role: varchar('role', { length: 50 }).notNull().default('user'),
   },
   () => ({
     primaryKey: {

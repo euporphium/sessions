@@ -24,7 +24,6 @@ function registerConnectionMiddleware(io: SessionsSocketServer) {
   io.use((socket, next) => {
     const { userId } = socket.handshake.auth;
     socket.data.userId = userId;
-    socket.emit('session', { userId });
     next();
   });
 }
@@ -57,9 +56,11 @@ function registerEvents(io: SessionsSocketServer) {
       socket.leave(roomId);
     });
 
-    socket.on('requestAccess', ({ roomId, userId }) => {
-      logger.info(`requesting access: ${roomId}`);
-      socket.to(`${roomId}:host`).emit('accessRequested', { userId });
+    socket.on('requestAccess', (accessRequest) => {
+      logger.info(`requesting access: ${accessRequest.roomId}`);
+      socket
+        .to(`${accessRequest.roomId}:host`)
+        .emit('accessRequested', accessRequest);
     });
 
     socket.on('grantAccess', ({ roomId, userId }) => {

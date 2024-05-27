@@ -3,14 +3,19 @@ import { z } from 'zod';
 import { sessionParticipants, sessions, users } from '@sessions/web-db';
 
 const sessionParticipantSelectSchema = createSelectSchema(sessionParticipants);
-type SessionParticipant = z.infer<typeof sessionParticipantSelectSchema>;
-
 export const sessionSelectSchema = createSelectSchema(sessions, {});
-export type Session = z.infer<typeof sessionSelectSchema>;
+export const userSelectSchema = createSelectSchema(users);
 
-export type SessionWithParticipants = Session & {
-  sessionParticipants: SessionParticipant[];
+export type User = z.infer<typeof userSelectSchema>;
+
+export type SessionWithUsers = Session & {
+  users: Array<User & { role: string }>;
 };
 
-export const userSelectSchema = createSelectSchema(users);
-export type User = z.infer<typeof userSelectSchema>;
+export type Session = z.infer<typeof sessionSelectSchema>;
+
+export type AccessRequest = {
+  roomId: string;
+  userId: string;
+  userName: string;
+};
