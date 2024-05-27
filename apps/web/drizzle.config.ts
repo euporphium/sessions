@@ -3,7 +3,7 @@ import { env } from './src/env';
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: './db/schema.ts',
+  schema: '../../libs/web/db/src/lib/schema.ts',
   out: './db/migrations',
   dbCredentials: {
     host: env.server.POSTGRES_HOST,
