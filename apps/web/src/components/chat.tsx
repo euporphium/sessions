@@ -10,9 +10,13 @@ type ChatProps = {
     id: string;
     name: string;
   };
+  session: {
+    id: number;
+    slug: string;
+  };
 };
 
-export default function Chat({ user }: ChatProps) {
+export default function Chat({ user, session }: ChatProps) {
   const {
     socket,
     meta: { isConnected },
@@ -28,10 +32,27 @@ export default function Chat({ user }: ChatProps) {
       setMessages((prev) => [...prev, message]);
     }
 
+    function onEndSession() {
+      const sender = { id: 'SERVER', name: 'Server' };
+      const messages = [
+        'Session ended by Host',
+        'Once you leave, you cannot rejoin',
+      ];
+      const flatMessages = messages.map((text) => ({
+        sender,
+        text,
+        sessionCode: session.slug,
+      }));
+
+      setMessages((prev) => [...prev, ...flatMessages]);
+    }
+
     socket.on('chat', onChat);
+    socket.on('endSession', onEndSession);
 
     return () => {
       socket.off('chat', onChat);
+      socket.off('endSession', onEndSession);
     };
   }, [socket]);
 
@@ -47,9 +68,13 @@ export default function Chat({ user }: ChatProps) {
     const formData = new FormData(form);
     // TODO always validation
     const message = formData.get('message') as string;
-    const chatMessage = { sender: user, text: message };
+    const chatMessage = {
+      sender: user,
+      text: message,
+      sessionCode: session.slug,
+    };
 
-    setMessages((prev) => [...prev, { sender: user, text: message }]);
+    setMessages((prev) => [...prev, chatMessage]);
     form.reset();
 
     socket.emit('chat', chatMessage);

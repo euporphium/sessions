@@ -38,8 +38,12 @@ export const sessionsRelations = relations(sessions, ({ many }) => ({
 export const sessionParticipants = pgTable(
   'session_participants',
   {
-    sessionId: integer('session_id').references(() => sessions.id),
-    userId: varchar('user_id', { length: 100 }).references(() => users.id),
+    sessionId: integer('session_id')
+      .references(() => sessions.id)
+      .notNull(),
+    userId: varchar('user_id', { length: 100 })
+      .references(() => users.id)
+      .notNull(),
   },
   () => ({
     primaryKey: {

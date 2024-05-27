@@ -24,7 +24,7 @@ function registerConnectionMiddleware(io: SessionsSocketServer) {
   logger.verbose('registering connection middleware');
 
   io.use((socket, next) => {
-    const { connectionId, sessionCode } = socket.handshake.auth;
+    const { connectionId, userId } = socket.handshake.auth;
 
     if (connectionId) {
       logger.verbose(`checking for connection: ${connectionId}`);
@@ -42,7 +42,7 @@ function registerConnectionMiddleware(io: SessionsSocketServer) {
       socket.data.connectionId = connectionStore.createConnection();
     }
 
-    socket.data.sessionCode = sessionCode;
+    socket.data.userId = userId;
 
     socket.emit('session', { id: socket.data.connectionId });
 
@@ -51,8 +51,6 @@ function registerConnectionMiddleware(io: SessionsSocketServer) {
 }
 
 function registerEvents(io: SessionsSocketServer) {
-  // const serverUser = { id: 'SERVER', name: 'Server' };
-
   logger.verbose('registering events');
 
   io.on('connection', (socket) => {
@@ -62,18 +60,7 @@ function registerEvents(io: SessionsSocketServer) {
       connected: true,
     });
 
-    socket.join(socket.data.connectionId);
-    socket.join(socket.data.sessionCode);
-
-    // io.to(socket.data.sessionCode).emit('chat', {
-    //   sender: serverUser,
-    //   text: 'A user connected',
-    // });
-
-    socket.on('chat', (message) => {
-      logger.info(`${message.sender.name} sent chat: ${message.text}`);
-      socket.broadcast.emit('chat', message);
-    });
+    socket.join(socket.data.userId);
 
     socket.on('disconnect', async (reason) => {
       logger.verbose(`socket disconnected: ${reason}`);
@@ -85,8 +72,38 @@ function registerEvents(io: SessionsSocketServer) {
           connected: false,
         });
       }
+    });
 
-      // io.emit('chat', { sender: serverUser, text: 'A user disconnected' });
+    socket.on('joinRoom', (roomId) => {
+      logger.info(`joining room: ${roomId}`);
+      socket.join(roomId);
+    });
+
+    socket.on('leaveRoom', (roomId) => {
+      logger.info(`leaving room: ${roomId}`);
+      socket.leave(roomId);
+    });
+
+    socket.on('requestAccess', ({ roomId, userId }) => {
+      logger.info(`requesting access: ${roomId}`);
+      socket.to(`${roomId}:host`).emit('accessRequested', { userId });
+    });
+
+    socket.on('grantAccess', ({ roomId, userId }) => {
+      logger.info(`granting access: ${roomId}`);
+      socket.to(userId).emit('accessGranted', { roomId });
+    });
+
+    socket.on('endSession', ({ slug }) => {
+      logger.info(`ending session: ${slug}`);
+      io.to(slug).emit('endSession');
+    });
+
+    socket.on('chat', (message) => {
+      logger.info(
+        `[${message.sessionCode}] ${message.sender.name} sent chat: ${message.text}`,
+      );
+      io.to(message.sessionCode).emit('chat', message);
     });
   });
 }

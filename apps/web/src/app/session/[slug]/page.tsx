@@ -21,19 +21,25 @@ export default async function SessionPage({ params }: SessionPageProps) {
   }
 
   const session = await getSessionBySlug(params.slug);
-  if (!session) {
+  if (!session || session.endedAt) {
     notFound();
   }
 
   const isHost = session.hostId === user.id;
 
   return (
-    <SocketContextProvider sessionCode={session.slug} autoConnect>
+    <SocketContextProvider userId={user.id} autoConnect>
       Welcome to {session.name}
       {isHost ? (
-        <HostSession user={{ id: user.id, name: user.firstName }} />
+        <HostSession
+          user={{ id: user.id, name: user.firstName }}
+          session={session}
+        />
       ) : (
-        <ParticipantSession user={{ id: user.id, name: user.firstName }} />
+        <ParticipantSession
+          user={{ id: user.id, name: user.firstName }}
+          session={session}
+        />
       )}
     </SocketContextProvider>
   );

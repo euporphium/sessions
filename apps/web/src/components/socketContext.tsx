@@ -11,7 +11,7 @@ import { env } from '../env';
 
 type SocketContextProviderProps = {
   children: React.ReactNode;
-  sessionCode?: string;
+  userId?: string;
   autoConnect?: boolean;
 };
 
@@ -27,13 +27,10 @@ const SocketContext = createContext<SocketContext | null>(null);
 
 export function SocketContextProvider({
   children,
-  sessionCode,
+  userId,
   autoConnect = false,
 }: SocketContextProviderProps) {
-  const { socket, isConnected, transport } = useSocket(
-    sessionCode,
-    autoConnect,
-  );
+  const { socket, isConnected, transport } = useSocket(userId, autoConnect);
 
   if (!socket) {
     return <div className="min-h-screen bg-red-800">Loading</div>;
@@ -66,7 +63,7 @@ export function useSocketClient() {
   };
 }
 
-function useSocket(sessionCode?: string, autoConnect = false) {
+function useSocket(userId?: string, autoConnect = false) {
   const [socket, setSocket] = useState<SessionsSocketClient | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState<string>('N/A');
@@ -81,7 +78,7 @@ function useSocket(sessionCode?: string, autoConnect = false) {
       autoConnect: autoConnect,
       auth: {
         connectionId: Cookies.get('connectionId'),
-        sessionCode,
+        userId,
       },
     });
 
