@@ -2,6 +2,7 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import db, { users } from '../../../../../db';
 import { z } from 'zod';
+import { env } from '../../../../env';
 
 // TODO: move to a shared location - 😎
 function nullify(value: unknown) {
@@ -45,5 +46,7 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  return NextResponse.redirect(request.nextUrl.searchParams.get('next') ?? '/');
+  return NextResponse.redirect(
+    request.nextUrl.searchParams.get('next') ?? env.server.BASE_URL,
+  );
 }
