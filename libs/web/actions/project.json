@@ -1,0 +1,9 @@
+{
+  "name": "web-actions",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/web/actions/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project web-actions --web",
+  "targets": {}
+}
