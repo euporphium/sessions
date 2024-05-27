@@ -17,6 +17,7 @@
     "paths": {
       "@sessions/effects": ["libs/ui/effects/src/index.ts"],
       "@sessions/effects/server": ["libs/ui/effects/src/server.ts"],
+      "@sessions/web-db": ["libs/shared/web-db/src/index.ts"],
       "@sessions/web-types": ["libs/shared/web-types/src/index.ts"]
     }
   },
