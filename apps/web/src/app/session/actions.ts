@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { z } from 'zod';
-import db, { sessions, sessionParticipants } from '../../../db';
+import { db, sessions, sessionParticipants } from '@sessions/web-db';
 import { eq } from 'drizzle-orm';
 
 export async function getAuthenticatedUser() {
@@ -14,7 +14,7 @@ export async function getAuthenticatedUser() {
     return null;
   }
 
-  const user = await db.query.users.findFirst({
+  const user = await db.instance.query.users.findFirst({
     where: (users, { eq }) => eq(users.id, kindeUser.id),
   });
 
@@ -22,7 +22,7 @@ export async function getAuthenticatedUser() {
 }
 
 export async function getUserSessions(userId: string) {
-  return db.query.sessionParticipants.findMany({
+  return db.instance.query.sessionParticipants.findMany({
     where: (sessionParticipants, { eq }) =>
       eq(sessionParticipants.userId, userId),
     with: { session: true },
@@ -30,7 +30,7 @@ export async function getUserSessions(userId: string) {
 }
 
 export async function getSessionBySlug(slug: string) {
-  return db.query.sessions.findFirst({
+  return db.instance.query.sessions.findFirst({
     where: (sessions, { eq }) => eq(sessions.slug, slug),
     with: { sessionParticipants: true },
   });
@@ -65,7 +65,7 @@ export async function createSession(formData: FormData) {
     return err;
   }
 
-  const result = await db.transaction(async (trx) => {
+  const result = await db.instance.transaction(async (trx) => {
     // Check if the slug is currently in use
     const activeWithSlug = await trx.query.sessions.findFirst({
       where: (sessions, { eq, isNull, and }) =>
@@ -100,7 +100,7 @@ export async function createSession(formData: FormData) {
 }
 
 export async function endSession(id: number) {
-  return db
+  return db.instance
     .update(sessions)
     .set({ endedAt: new Date() })
     .where(eq(sessions.id, id))
@@ -108,5 +108,5 @@ export async function endSession(id: number) {
 }
 
 export async function addParticipant(sessionId: number, userId: string) {
-  return db.insert(sessionParticipants).values({ sessionId, userId });
+  return db.instance.insert(sessionParticipants).values({ sessionId, userId });
 }
