@@ -2,11 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import Cookies from 'js-cookie';
-import type {
-  SessionsSocketClient,
-  SocketConnection,
-} from '@sessions/web-types';
+import type { SessionsSocketClient } from '@sessions/web-types';
 import { env } from '../env';
 
 type SocketContextProviderProps = {
@@ -76,10 +72,7 @@ function useSocket(userId?: string, autoConnect = false) {
 
     const newSocket = io(env.client.NEXT_PUBLIC_SOCKET_SERVER_URL, {
       autoConnect: autoConnect,
-      auth: {
-        connectionId: Cookies.get('connectionId'),
-        userId,
-      },
+      auth: { userId },
     });
 
     setSocket(newSocket);
@@ -105,8 +98,6 @@ function useSocket(userId?: string, autoConnect = false) {
     newSocket.on('disconnect', onDisconnect);
     newSocket.on('connect_error', onConnectError);
 
-    registerCustomListeners(newSocket);
-
     return () => {
       newSocket.off('connect', onConnect);
       newSocket.off('disconnect', onDisconnect);
@@ -115,14 +106,4 @@ function useSocket(userId?: string, autoConnect = false) {
   }, []);
 
   return { socket, isConnected, transport };
-}
-
-function registerCustomListeners(socket: SessionsSocketClient) {
-  // typed quickly - think about it
-  function onSession(session: Pick<SocketConnection, 'id'>) {
-    console.log(`received session id: ${session.id} - storing in cookies`);
-    Cookies.set('sessionId', session.id);
-  }
-
-  socket.on('session', onSession);
 }

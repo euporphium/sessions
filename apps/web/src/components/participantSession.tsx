@@ -2,7 +2,7 @@
 
 import Chat from './chat';
 import { useSocketClient } from './socketContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 type ParticipantSessionProps = {
   user: {
@@ -23,6 +23,10 @@ export default function ParticipantSession({
   user,
   session,
 }: ParticipantSessionProps) {
+  const alreadyParticipant = session.sessionParticipants.some(
+    (p) => p.userId === user.id,
+  );
+  const [isParticipant, setIsParticipant] = useState(alreadyParticipant);
   const { socket } = useSocketClient();
 
   useEffect(() => {
@@ -30,9 +34,16 @@ export default function ParticipantSession({
       return;
     }
 
+    if (alreadyParticipant) {
+      setIsParticipant(true);
+      socket.emit('joinRoom', session.slug);
+      return;
+    }
+
     function onAccessGranted({ roomId }: { roomId: string }) {
       console.log('Access granted to room', roomId);
       socket.emit('joinRoom', roomId);
+      setIsParticipant(true);
     }
 
     socket.on('accessGranted', onAccessGranted);
@@ -42,10 +53,6 @@ export default function ParticipantSession({
     };
   }, [socket]);
 
-  const inSession = session.sessionParticipants.find(
-    (p) => p.userId === user.id,
-  );
-
   function requestAccess() {
     socket.emit('requestAccess', { roomId: session.slug, userId: user.id });
   }
@@ -53,7 +60,7 @@ export default function ParticipantSession({
   return (
     <div>
       <div>Participant Session</div>
-      {inSession ? (
+      {isParticipant ? (
         <Chat user={user} session={session} />
       ) : (
         <div>

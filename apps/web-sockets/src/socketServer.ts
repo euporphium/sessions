@@ -1,12 +1,10 @@
 import http from 'http';
 import { Server } from 'socket.io';
 import { SessionsSocketServer } from '@sessions/web-types';
-import { InMemoryConnectionStore } from './sessionStore';
 import { getLogger } from './logger';
 import env from '../env';
 
 const logger = getLogger();
-const connectionStore = new InMemoryConnectionStore(logger);
 
 export function addSocketServer(server: http.Server) {
   logger.verbose('adding socket server');
@@ -24,28 +22,9 @@ function registerConnectionMiddleware(io: SessionsSocketServer) {
   logger.verbose('registering connection middleware');
 
   io.use((socket, next) => {
-    const { connectionId, userId } = socket.handshake.auth;
-
-    if (connectionId) {
-      logger.verbose(`checking for connection: ${connectionId}`);
-      const connection = connectionStore.findConnection(connectionId);
-
-      if (connection) {
-        logger.verbose(`connection found: ${connection.id}`);
-        socket.data.connectionId = connection.id;
-      } else {
-        logger.verbose(`connection not found: ${connectionId}`);
-        socket.data.connectionId = connectionStore.createConnection();
-      }
-    } else {
-      logger.verbose('no connection id provided');
-      socket.data.connectionId = connectionStore.createConnection();
-    }
-
+    const { userId } = socket.handshake.auth;
     socket.data.userId = userId;
-
-    socket.emit('session', { id: socket.data.connectionId });
-
+    socket.emit('session', { userId });
     next();
   });
 }
@@ -54,11 +33,7 @@ function registerEvents(io: SessionsSocketServer) {
   logger.verbose('registering events');
 
   io.on('connection', (socket) => {
-    logger.verbose(`connected to: ${socket.data.connectionId}`);
-
-    connectionStore.updateConnection(socket.data.connectionId, {
-      connected: true,
-    });
+    logger.verbose(`connected as: ${socket.data.userId}`);
 
     socket.join(socket.data.userId);
 
@@ -68,9 +43,7 @@ function registerEvents(io: SessionsSocketServer) {
       const matchingSockets = await io.in(socket.id).fetchSockets();
       const isDisconnected = matchingSockets.length === 0;
       if (isDisconnected) {
-        connectionStore.updateConnection(socket.data.connectionId, {
-          connected: false,
-        });
+        // user has left the building
       }
     });
 
@@ -103,7 +76,7 @@ function registerEvents(io: SessionsSocketServer) {
       logger.info(
         `[${message.sessionCode}] ${message.sender.name} sent chat: ${message.text}`,
       );
-      io.to(message.sessionCode).emit('chat', message);
+      socket.to(message.sessionCode).emit('chat', message);
     });
   });
 }
