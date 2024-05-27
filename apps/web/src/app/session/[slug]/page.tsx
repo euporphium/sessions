@@ -34,15 +34,9 @@ export default async function SessionPage({ params }: SessionPageProps) {
     <SocketContextProvider userId={user.id} autoConnect>
       Welcome to {session.name}
       {isAdmin ? (
-        <AdminSession
-          user={{ id: user.id, name: user.firstName }}
-          session={session}
-        />
+        <AdminSession user={user} session={session} />
       ) : (
-        <ParticipantSession
-          user={{ id: user.id, name: user.firstName }}
-          session={session}
-        />
+        <ParticipantSession user={user} session={session} />
       )}
     </SocketContextProvider>
   );

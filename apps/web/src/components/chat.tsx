@@ -2,18 +2,16 @@
 
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
-import type { ChatMessage } from '@sessions/web-types';
+import type {
+  ChatMessage,
+  SessionWithParticipants,
+  User,
+} from '@sessions/web-types';
 import { cn } from '../../../../libs/ui/effects/src/lib/cn';
 
 type ChatProps = {
-  user: {
-    id: string;
-    name: string;
-  };
-  session: {
-    id: number;
-    slug: string;
-  };
+  user: User;
+  session: SessionWithParticipants;
 };
 
 export default function Chat({ user, session }: ChatProps) {
@@ -69,7 +67,7 @@ export default function Chat({ user, session }: ChatProps) {
     // TODO always validation
     const message = formData.get('message') as string;
     const chatMessage = {
-      sender: user,
+      sender: { id: user.id, name: user.firstName },
       text: message,
       sessionCode: session.slug,
     };

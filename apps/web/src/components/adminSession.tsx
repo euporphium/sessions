@@ -4,20 +4,11 @@ import Chat from './chat';
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
 import { addSessionParticipant, endSession } from '@sessions/web-actions';
+import type { User, SessionWithParticipants } from '@sessions/web-types';
 
 type HostSessionProps = {
-  user: {
-    id: string;
-    name: string;
-  };
-  session: {
-    id: number;
-    slug: string;
-    sessionParticipants: {
-      sessionId: number;
-      userId: string;
-    }[];
-  };
+  user: User;
+  session: SessionWithParticipants;
 };
 
 export default function AdminSession({ user, session }: HostSessionProps) {

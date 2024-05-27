@@ -3,20 +3,15 @@
 import Chat from './chat';
 import { useSocketClient } from './socketContext';
 import { useEffect, useState } from 'react';
+import {
+  type Session,
+  type SessionWithParticipants,
+  User,
+} from '@sessions/web-types';
 
 type ParticipantSessionProps = {
-  user: {
-    id: string;
-    name: string;
-  };
-  session: {
-    id: number;
-    slug: string;
-    sessionParticipants: {
-      sessionId: number;
-      userId: string;
-    }[];
-  };
+  user: User;
+  session: SessionWithParticipants;
 };
 
 export default function ParticipantSession({
