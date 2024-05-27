@@ -1,9 +1,9 @@
 {
   "name": "web-types",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/web-types/src",
+  "sourceRoot": "libs/web/types/src",
   "projectType": "library",
-  "tags": ["type:shared"],
+  "tags": [],
   "// targets": "to see all targets run: nx show project web-types --web",
   "targets": {}
 }

@@ -1,7 +1,7 @@
 {
   "name": "web-db",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/web-db/src",
+  "sourceRoot": "libs/web/db/src",
   "projectType": "library",
   "tags": [],
   "// targets": "to see all targets run: nx show project web-db --web",
