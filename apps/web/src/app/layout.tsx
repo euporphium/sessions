@@ -28,8 +28,9 @@ export default async function RootLayout({
 function initDb() {
   initializePostgresDatabase({
     host: env.server.POSTGRES_HOST,
-    database: env.server.POSTGRES_DB,
+    port: +env.server.POSTGRES_PORT, // TODO? Do better. Zod transform?
     username: env.server.POSTGRES_USER,
     password: env.server.POSTGRES_PASSWORD,
+    database: env.server.POSTGRES_DB,
   });
 }

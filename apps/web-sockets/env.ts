@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   LOG_LEVEL: z.string(),
-  PORT: z.coerce.number().min(1000),
+  PORT: z.string(),
   CORS_ORIGIN: z.string().url(),
 });
 

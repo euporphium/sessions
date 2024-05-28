@@ -7,8 +7,9 @@ export default defineConfig({
   out: './db/migrations',
   dbCredentials: {
     host: env.server.POSTGRES_HOST,
+    port: +env.server.POSTGRES_PORT,
+    database: env.server.POSTGRES_DB,
     user: env.server.POSTGRES_USER,
     password: env.server.POSTGRES_PASSWORD,
-    database: env.server.POSTGRES_DB,
   },
 });

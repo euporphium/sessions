@@ -1,0 +1,58 @@
+services:
+  web:
+    build:
+      dockerfile: apps/web/Dockerfile
+      context: ..
+      target: final
+    ports:
+      - 3000:3000
+    env_file:
+      - ../apps/web/.env.local
+      - ../apps/web/.env.docker.local
+    secrets:
+      - kinde-client-secret
+      - web-db-password
+    environment:
+      KINDE_CLIENT_SECRET: /run/secrets/kinde-client-secret
+      POSTGRES_PASSWORD: /run/secrets/web-db-password
+    depends_on:
+      web-db:
+        condition: service_healthy
+
+  web-sockets:
+    build:
+      dockerfile: apps/web-sockets/Dockerfile
+      context: ..
+      target: final
+    ports:
+      - 3333:3333
+    env_file:
+      - ../apps/web-sockets/.env.local
+
+  web-db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - web-db-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - web-db-password
+    environment:
+      - POSTGRES_DB=sessions
+      - POSTGRES_PASSWORD_FILE=/run/secrets/web-db-password
+
+volumes:
+  web-db-data:
+
+secrets:
+  web-db-password:
+    file: web-db-password.secret
+  kinde-client-secret:
+    file: kinde-client-secret.secret
