@@ -1,0 +1,13 @@
+{
+  "version": "6",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1716878635537,
+      "tag": "0000_secret_malice",
+      "breakpoints": true
+    }
+  ]
+}
