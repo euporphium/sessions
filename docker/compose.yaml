@@ -13,8 +13,8 @@ services:
       - kinde-client-secret
       - web-db-password
     environment:
-      KINDE_CLIENT_SECRET: /run/secrets/kinde-client-secret
-      POSTGRES_PASSWORD: /run/secrets/web-db-password
+      KINDE_CLIENT_SECRET_FILE: /run/secrets/kinde-client-secret
+      POSTGRES_PASSWORD_FILE: /run/secrets/web-db-password
     depends_on:
       web-db:
         condition: service_healthy
@@ -45,8 +45,8 @@ services:
     secrets:
       - web-db-password
     environment:
-      - POSTGRES_DB=sessions
-      - POSTGRES_PASSWORD_FILE=/run/secrets/web-db-password
+      POSTGRES_DB: sessions
+      POSTGRES_PASSWORD_FILE: /run/secrets/web-db-password
 
 volumes:
   web-db-data:

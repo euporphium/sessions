@@ -1,7 +1,7 @@
 {
   "name": "web-sockets",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "app/web-sockets/src",
+  "sourceRoot": "apps/web-sockets/src",
   "projectType": "application",
   "tags": ["type:node", "type:express"],
   "targets": {
