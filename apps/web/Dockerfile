@@ -14,8 +14,11 @@ FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY . .
-ENV NODE_ENV production
-RUN pnpm exec nx run web:build
+ENV NODE_ENV=production
+RUN pnpm nx run web:build
+
+FROM build as migrate
+CMD ["pnpm", "nx", "run", "web:drizzle-migrate"]
 
 FROM base AS final
 
@@ -30,6 +33,5 @@ COPY --from=build --chown=nextjs:nodejs /_app/apps/web/.next/static ./apps/web/.
 USER nextjs
 
 EXPOSE 3000
-ENV PORT 3000
 
 CMD ["node", "apps/web/server.js"]

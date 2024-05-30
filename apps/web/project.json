@@ -12,14 +12,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/web",
-        "command": "dotenvx run -f .env.local -- drizzle-kit push"
+        "command": "drizzle-kit push"
+      }
+    },
+    "drizzle-migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/web",
+        "command": "drizzle-kit migrate"
       }
     },
     "drizzle-studio": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/web",
-        "command": "dotenvx run -f .env.local -- drizzle-kit studio"
+        "command": "drizzle-kit studio"
       }
     }
   }

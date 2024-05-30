@@ -18,6 +18,8 @@ services:
     depends_on:
       web-db:
         condition: service_healthy
+      web-db-migrate:
+        condition: service_completed_successfully
 
   web-sockets:
     build:
@@ -47,6 +49,22 @@ services:
     environment:
       POSTGRES_DB: sessions
       POSTGRES_PASSWORD_FILE: /run/secrets/web-db-password
+
+  web-db-migrate:
+    build:
+      dockerfile: apps/web/Dockerfile
+      context: ..
+      target: migrate
+    env_file:
+      - ../apps/web/.env.local
+      - ../apps/web/.env.docker.local
+    secrets:
+      - web-db-password
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/web-db-password
+    depends_on:
+      web-db:
+        condition: service_healthy
 
 volumes:
   web-db-data:
