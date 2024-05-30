@@ -1,11 +1,26 @@
 services:
+  proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 81:81
+      - 443:443
+    healthcheck:
+      test: [ "CMD", "/usr/bin/check-health" ]
+      interval: 10s
+      timeout: 3s
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
   web:
     build:
       dockerfile: apps/web/Dockerfile
       context: ..
       target: final
-    ports:
-      - 3000:3000
+    expose:
+      - 3000
     env_file:
       - ../apps/web/.env.local
       - ../apps/web/.env.docker.local
@@ -26,8 +41,8 @@ services:
       dockerfile: apps/web-sockets/Dockerfile
       context: ..
       target: final
-    ports:
-      - 3333:3333
+    expose:
+      - 3333
     env_file:
       - ../apps/web-sockets/.env.local
 
