@@ -18,7 +18,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY . .
 ENV NODE_ENV production
-RUN pnpm exec nx run web-sockets:build
+RUN pnpm nx run web-sockets:build
 
 FROM base AS final
 

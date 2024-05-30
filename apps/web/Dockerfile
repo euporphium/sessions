@@ -10,15 +10,18 @@ WORKDIR /_app
 
 COPY package.json pnpm-lock.yaml ./
 
-FROM base AS build
+FROM base AS deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY . .
+
+FROM deps as migrate
+CMD ["pnpm", "nx", "run", "web:drizzle-migrate"]
+
+FROM deps as build
+
 ENV NODE_ENV=production
 RUN pnpm nx run web:build
-
-FROM build as migrate
-CMD ["pnpm", "nx", "run", "web:drizzle-migrate"]
 
 FROM base AS final
 
