@@ -15,8 +15,8 @@ type SessionPageProps = {
 export default async function SessionPage({ params }: SessionPageProps) {
   const user = await getAuthenticatedUser();
   if (!user) {
-    const successUrl = new URL(env.server.KINDE_POST_LOGIN_REDIRECT_URL);
-    const nextUrl = `${env.server.BASE_URL}/session/${params.slug}`;
+    const successUrl = new URL(env.KINDE_POST_LOGIN_REDIRECT_URL);
+    const nextUrl = `${env.BASE_URL}/session/${params.slug}`;
     successUrl.searchParams.set('next', nextUrl);
     redirect(
       `/api/auth/login?post_login_redirect_url=${successUrl.toString()}`,

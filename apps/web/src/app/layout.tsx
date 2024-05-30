@@ -14,7 +14,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await initDb();
+  initDb();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -26,14 +26,11 @@ export default async function RootLayout({
 }
 
 function initDb() {
-  return initializePostgresDatabase(
-    {
-      host: env.server.POSTGRES_HOST,
-      port: +env.server.POSTGRES_PORT, // TODO? Do better. Zod transform?
-      username: env.server.POSTGRES_USER,
-      password: env.server.POSTGRES_PASSWORD,
-      database: env.server.POSTGRES_DB,
-    },
-    '../../../libs/web/db/migrations',
-  );
+  initializePostgresDatabase({
+    host: env.POSTGRES_HOST,
+    port: +env.POSTGRES_PORT, // TODO? Do better. Zod transform?
+    username: env.POSTGRES_USER,
+    password: env.POSTGRES_PASSWORD,
+    database: env.POSTGRES_DB,
+  });
 }

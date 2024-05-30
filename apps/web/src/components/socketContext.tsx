@@ -70,7 +70,7 @@ function useSocket(userId?: string, autoConnect = false) {
       return;
     }
 
-    const newSocket = io(env.client.NEXT_PUBLIC_SOCKET_SERVER_URL, {
+    const newSocket = io(env.NEXT_PUBLIC_SOCKET_SERVER_URL, {
       autoConnect: autoConnect,
       auth: { userId },
     });

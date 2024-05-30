@@ -49,6 +49,6 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(
-    request.nextUrl.searchParams.get('next') ?? env.server.BASE_URL,
+    request.nextUrl.searchParams.get('next') ?? env.BASE_URL,
   );
 }

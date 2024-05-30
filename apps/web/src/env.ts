@@ -18,5 +18,10 @@ export const env = createEnv({
 
     BASE_URL: z.string().url(),
   },
-  experimental__runtimeEnv: process.env,
+  client: {
+    NEXT_PUBLIC_SOCKET_SERVER_URL: z.string().url(),
+  },
+  experimental__runtimeEnv: {
+    NEXT_PUBLIC_SOCKET_SERVER_URL: process.env.NEXT_PUBLIC_SOCKET_SERVER_URL,
+  },
 });
