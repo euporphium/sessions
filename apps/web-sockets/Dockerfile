@@ -1,6 +1,10 @@
 FROM node:22.1.0-alpine as base
 # RUN apk add --no-cache libc6-compat
+
+# Install pnpm
 RUN corepack enable pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
 WORKDIR /_app
 
@@ -8,14 +12,13 @@ COPY package.json pnpm-lock.yaml ./
 
 FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
-RUN ls -la
 
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY . .
 ENV NODE_ENV production
-RUN pnpm dlx nx run web-sockets:build
+RUN pnpm exec nx run web-sockets:build
 
 FROM base AS final
 
