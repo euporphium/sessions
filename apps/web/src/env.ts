@@ -17,6 +17,7 @@ export const env = createEnv({
     POSTGRES_DB: z.string().min(1),
 
     BASE_URL: z.string().url(),
+    DB_INIT_TOKEN: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_SOCKET_SERVER_URL: z.string().url(),

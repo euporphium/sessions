@@ -1,8 +1,6 @@
-import { initializePostgresDatabase } from '@sessions/web-db';
 import { ThemeProvider } from 'next-themes';
 
 import './global.css';
-import { env } from '../env';
 
 export const metadata = {
   title: 'Welcome to apps/web',
@@ -14,8 +12,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  initDb();
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
@@ -23,14 +19,4 @@ export default async function RootLayout({
       </body>
     </html>
   );
-}
-
-function initDb() {
-  initializePostgresDatabase({
-    host: env.POSTGRES_HOST,
-    port: +env.POSTGRES_PORT, // TODO? Do better. Zod transform?
-    username: env.POSTGRES_USER,
-    password: env.POSTGRES_PASSWORD,
-    database: env.POSTGRES_DB,
-  });
 }

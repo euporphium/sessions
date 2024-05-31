@@ -81,10 +81,21 @@ services:
       web-db:
         condition: service_healthy
 
+  web-db-init:
+    image: curlimages/curl:latest
+    command: [ "-X", "POST", "http://web:3000/api/init", "-d", /run/secrets/web-db-init-token]
+    secrets:
+      - web-db-init-token
+    depends_on:
+      - web
+      - web-db
+
 volumes:
   web-db-data:
 
 secrets:
+  web-db-init-token:
+    file: web-db-init-token.secret
   web-db-password:
     file: web-db-password.secret
   kinde-client-secret:
