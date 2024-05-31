@@ -83,7 +83,7 @@ services:
 
   web-db-init:
     image: curlimages/curl:latest
-    command: [ "-X", "POST", "http://web:3000/api/init", "-d", /run/secrets/web-db-init-token]
+    command: [ "-X", "POST", "http://web:3000/api/init", "-d", "@/run/secrets/web-db-init-token"]
     secrets:
       - web-db-init-token
     depends_on:
