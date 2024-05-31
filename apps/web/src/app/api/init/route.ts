@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  await initializePostgresDatabase({
+  initializePostgresDatabase({
     host: env.POSTGRES_HOST,
     port: +env.POSTGRES_PORT, // TODO? Do better. Zod transform?
     username: env.POSTGRES_USER,
