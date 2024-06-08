@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { initializePostgresDatabase } from '@sessions/web-db';
+import { getDbClient } from '@sessions/web-db';
 import { env } from '../../../env';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  initializePostgresDatabase({
+  getDbClient({
     host: env.POSTGRES_HOST,
     port: +env.POSTGRES_PORT, // TODO? Do better. Zod transform?
     username: env.POSTGRES_USER,

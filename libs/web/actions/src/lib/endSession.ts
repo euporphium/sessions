@@ -1,10 +1,11 @@
 'use server';
 
-import { db, sessions } from '@sessions/web-db';
+import { sessions } from '@sessions/web-db';
 import { eq } from 'drizzle-orm';
+import { db } from '../../../../../apps/web/src/db';
 
 export async function endSession(id: number) {
-  return db.instance
+  return db
     .update(sessions)
     .set({ endedAt: new Date() })
     .where(eq(sessions.id, id))

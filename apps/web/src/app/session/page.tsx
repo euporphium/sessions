@@ -7,6 +7,7 @@ import { createSession, getAuthenticatedUser } from '@sessions/web-actions';
 
 export default async function SessionCreationPage() {
   const { isAuthenticated } = getKindeServerSession();
+
   if (!(await isAuthenticated())) {
     redirect(`/api/auth/login`);
   }

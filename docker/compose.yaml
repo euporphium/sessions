@@ -23,7 +23,7 @@ services:
       - 3000
     env_file:
       - ../apps/web/.env.local
-      - ../apps/web/.env.docker.local
+#      - ../apps/web/.env.docker.local
     secrets:
       - kinde-client-secret
       - web-db-password
@@ -72,7 +72,7 @@ services:
       target: migrate
     env_file:
       - ../apps/web/.env.local
-      - ../apps/web/.env.docker.local
+#      - ../apps/web/.env.docker.local
     secrets:
       - web-db-password
     environment:

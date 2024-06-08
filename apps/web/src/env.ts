@@ -11,7 +11,7 @@ export const env = createEnv({
     KINDE_POST_LOGIN_REDIRECT_URL: z.string().url(),
 
     POSTGRES_HOST: z.string(),
-    POSTGRES_PORT: z.string(),
+    POSTGRES_PORT: z.coerce.number().min(1000),
     POSTGRES_USER: z.string().min(1),
     POSTGRES_PASSWORD: z.string().min(1),
     POSTGRES_DB: z.string().min(1),

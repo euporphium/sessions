@@ -6,7 +6,8 @@ import {
   getAuthenticatedUser,
   getSessionWithUsersBySlug,
 } from '@sessions/web-actions';
-import { db, sessionParticipants, sessions } from '@sessions/web-db';
+import { sessionParticipants, sessions } from '@sessions/web-db';
+import { db } from '../../../../../apps/web/src/db';
 
 export async function createSession(formData: FormData) {
   const user = await getAuthenticatedUser();
@@ -37,7 +38,7 @@ export async function createSession(formData: FormData) {
     return err;
   }
 
-  const result = await db.instance.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     const activeWithSlug = await getSessionWithUsersBySlug(
       validatedFormData.data.slug,
     );
